@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gaphor2md - Estrae uno strato semantico Markdown dai modelli Gaphor (.gaphor).
+gaphor2MD - Estrae uno strato semantico Markdown dai modelli Gaphor (.gaphor).
 
 Il formato .gaphor e' XML: ogni elemento del modello e' un tag di primo livello
 il cui nome coincide con la metaclasse UML. Le proprieta' sono espresse come:
@@ -15,9 +15,9 @@ LLM: indice dei diagrammi, elementi raggruppati per package, tabella unica
 delle relazioni.
 
 Esempi:
-    python gaphor2md.py modello.gaphor -o docs/model
-    python gaphor2md.py -r src/ -o docs/model --single-file
-    python gaphor2md.py -r src/ -o docs/model --check   # per la CI
+    python gaphor2MD.py modello.gaphor -o docs/model
+    python gaphor2MD.py -r src/ -o docs/model --single-file
+    python gaphor2MD.py -r src/ -o docs/model --check   # per la CI
 """
 
 from __future__ import annotations
@@ -611,13 +611,13 @@ def renderModelMarkdown(index: ModelIndex, sourcePath: Path, sourceHash: str) ->
         "---",
         f"source: {sourcePath.name}",
         f"sourceHash: {sourceHash}",
-        "generator: gaphor2md",
+        "generator: gaphor2MD",
         "---",
         "",
         f"# Modello: {sourcePath.stem}",
         "",
         "Strato semantico generato automaticamente dal file Gaphor. "
-        "Non modificare a mano: rigenerare con `gaphor2md.py`.",
+        "Non modificare a mano: rigenerare con `gaphor2MD.py`.",
         "",
         "| Tipo | Conteggio |",
         "| --- | --- |",
