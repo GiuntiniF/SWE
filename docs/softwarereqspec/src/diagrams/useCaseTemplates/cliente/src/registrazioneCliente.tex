@@ -1,0 +1,60 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{A-01} \\ \hline
+  \ucname{Registrazione Atleta} \\ \hline
+  \ucactor{Atleta} \\ \hline
+  \ucdescription{L'atleta inserisce le proprie credenziali
+    di accesso per accedere al sistema.} \\ \hline
+  \ucprecond{Il PT deve aver aggiunto l'atleta
+    nell'applicativo, e l'atleta deve aver ricevuto la mail
+    con le istruzioni sul primo accesso e la password temporanea
+    monouso.} \\ \hline
+  \ucpostcond{L'atleta ha impostato la sua password
+    e ha completato la registrazione.} \\ \hline
+  \ucmainflow{
+    \item L'atleta apre il link presente nella mail.
+    \item Il sistema mostra il form di inserimento mail.
+    \item L'atleta inserisce la email.
+    \item L'atleta preme il pulsante "Continua".
+    \item Il sistema verifica la mail nel database.
+    \item Il sistema mostra il form di inserimento della password temporanea.
+    \item L'atleta inserisce la password temporanea che ha ricevuto
+      nella mail.
+    \item L'atleta preme il pulsante "Accedi".
+    \item Il sistema verifica la password temporanea nel database.
+    \item Il sistema mostra il form di inserimento nuova password.
+    \item L'atleta inserisce la nuova password.
+    \item L'atleta preme il tasto "Modifica Password".
+    \item Il sistema salva la password criptata nel database.
+    \item Il sistema mostra il form con i dati da inserire rimanenti
+      (data di nascita, altezza, peso).
+    \item L'atleta inserisce i dati rimanenti.
+    \item L'atleta preme il bottone "Completa Registrazione".
+    \item Il sistema salva i dati nel database.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{5a. Email errata:} \newline
+    - Il sistema mostra un messaggio di errore ("Email non valida"). \newline
+    - Il flusso riprende dal punto 2. \newline
+    \textbf{9a. Codice di conferma errato:} \newline
+    - Il sistema mostra un messaggio di errore ("Codice di conferma non
+    valido"). \newline
+    - Il flusso riprende dal punto 8. \newline
+    \textbf{9b. Codice di conferma scaduto:} \newline
+    - Il sistema mostra un messaggio di errore ("Codice di conferma
+    scaduto"). \newline
+    - Il flusso riprende dal punto 2 in quanto si deve richiedere
+    l'invio di un nuovo codice.\newline
+    \textbf{12a. Password troppo debole} \newline
+    - Il sistema mostra un messaggio di errore ("La password inserita
+    deve contenere almeno...")
+    - Il flusso riprende dal punto 10.
+  } \\ \hline
+\end{tabularx}
+\end{document}

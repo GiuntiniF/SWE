@@ -1,0 +1,33 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-03} \\ \hline
+  \ucname{Creazione nuovo Template Scheda} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Il PT crea un template di scheda da
+    cui poter creare le schede per gli atleti.} \\ \hline
+  \ucprecond{Il PT deve essere loggato.} \\ \hline
+  \ucpostcond{Viene creato un nuovo Template di Scheda.} \\ \hline
+  \ucmainflow{
+    \item Il PT atterra sulla pagina di crezione nuovo Template Scheda.
+    \item Il sistema mostra il form di inserimento dati della scheda
+      (nome, descrizione, numero di sessioni di allenamento settimanali).
+    \item Il PT inserisce i dati della scheda.
+    \item Il PT preme il pulsante "Continua".
+    \item Il sistema verifica il nome nel database.
+    \item Il sistema mostra una pagina di conferma creazione.
+    \item Il sistema reindirizza il PT alla configurazione degli allenamenti.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{5a. Template con stesso nome già presente} \newline
+    - Il sistema mostra un messaggio di errore ("Esiste già una scheda
+    con questo nome"). \newline
+    - Il flusso riprende dal punto 2. \newline
+  } \\ \hline
+\end{tabularx}
+\end{document}

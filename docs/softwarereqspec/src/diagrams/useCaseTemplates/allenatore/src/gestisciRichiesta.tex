@@ -1,0 +1,40 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-06} \\ \hline
+  \ucname{Gestione Richiesta di Sessione di Allenamento} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Il PT conferma o rifiuta una richiesta
+    di sessione di allenamento che ha ricevuto da un atleta.} \\ \hline
+  \ucprecond{Il PT deve essere autenticato, e
+    deve essere presente almeno una richiesta di sessione in attesa di essere
+    confermata o rifiutata.} \\ \hline
+  \ucpostcond{La richiesta di sessione viene
+    confermata o rifiutata, e l'atleta riceve una mail di notifica
+    di conferma o rifiuto.} \\ \hline
+  \ucmainflow{
+    \item Il PT atterra sulla pagina della lista richieste di sessione.
+    \item Il PT preme una richiesta.
+    \item Il sistema mostra i dettagli della richiesta, in
+      particolare l'atleta che la ha effettuata, la palestra in cui
+      tale atleta si allena, la data/ora e motivazione della richiesta.
+    \item Il PT preme il tasto "Conferma Richiesta".
+    \item Il sistema crea nel database la sessione di allenamento.
+    \item Il sistema invia all'atleta una mail per informarlo che la
+      richiesta è stata confermata.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{4a. Tasto "Rifiuta Richiesta"} \newline
+    - Il sistema mostra un form con la motivazione del rifiuto. \newline
+    - Il PT preme il tasto "Conferma Rifiuto". \newline
+    - Il sistema salva la richiesta rifiutata. \newline
+    - Il sistema invia all'atleta una mail per informarlo che la
+    richiesta è stata rifiutata.
+  } \\ \hline
+\end{tabularx}
+\end{document}

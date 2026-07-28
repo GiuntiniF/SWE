@@ -1,0 +1,35 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{A-05} \\ \hline
+  \ucname{Modifica Dati Anagrafici} \\ \hline
+  \ucactor{Atleta registrato} \\ \hline
+  \ucdescription{L'atleta modifica i propri dati anagrafici
+    (altezza, peso, data di nascita).} \\ \hline
+  \ucprecond{L'atleta deve essere autenticato.} \\ \hline
+  \ucpostcond{I dati anagrafici dell'atleta vengono
+    aggiornati nel sistema.} \\ \hline
+  \ucmainflow{
+    \item L'atleta atterra sulla pagina del proprio profilo.
+    \item Il sistema mostra i dati anagrafici correnti.
+    \item L'atleta preme il tasto "Modifica Dati".
+    \item Il sistema mostra il form di modifica dati (data di nascita,
+      altezza, peso).
+    \item L'atleta modifica i dati desiderati.
+    \item L'atleta preme il tasto "Salva Modifiche".
+    \item Il sistema verifica e salva i dati nel database.
+    \item Il sistema mostra un messaggio di conferma.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{7a. Dati non validi} \newline
+    - Il sistema mostra un messaggio di errore ("Dati inseriti non
+    validi"). \newline
+    - Il flusso riprende dal punto 4.
+  } \\ \hline
+\end{tabularx}
+\end{document}

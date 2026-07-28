@@ -1,0 +1,46 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{parskip}
+\setcounter{secnumdepth}{0}
+\title{Statement Elaborato SWE}
+\author{Francesco Giuntini}
+\date{Gennaio 2026}
+
+\begin{document}
+\maketitle
+\textbf{Tipologia elaborato:} Modo 2.\newline\newline
+Si vuole realizzare un applicativo software per la \textbf{gestione
+  dei programmi di allenamento} degli atleti di un personal trainer,
+fornendo al PT la possibilità di creare ed assegnare schede
+di allenamento.
+\section{Descrizione}
+Ci sono 2 tipi di utenti, ciascuno con diversi permessi:
+\begin{itemize}
+  \item \textbf{PT:} può visualizzare i dettagli dei suoi
+    atleti, creare, assegnare e modificare le schede di tali
+    atleti, accettare richieste di sessioni di allenamento da parte
+    degli atleti e visualizzare tutte le sessioni di allenamento già prenotate.
+  \item \textbf{Atleta:} può inserire e modificare i propri dati
+    anagrafici, visualizzare le schede di allenamento a lui
+    assegnate, richiedere sessioni di allenamento con il PT e
+    visualizzare le proprie sessioni già prenotate.
+\end{itemize}
+Ciascun PT deve registrarsi per poter usare l'applicativo,
+sarà il PT a registrare i propri atleti.\newline\newline
+Una \textbf{scheda }raggruppa un numero di mesi di allenamento,
+ciascun mese contiene i varia allenamenti composti a loro volta da
+esercizi.\newline Una scheda può essere assegnata ad uno o più
+atleti, e non si può assegnare ad un atleta due schede i cui
+intervalli di tempo si sovrappongono (per esempio una scheda da
+gennaio a marzo e una da febbraio ad aprile).\newline\newline
+Un \textbf{esercizio} è definito dal suo nome, il gruppo muscolare
+che allena, il peso da sollevare e il numero di serie e ripetizioni
+da effettuare.\newline La tipologia di esercizi in una scheda varia
+solo da mese a mese, ma il peso o le serie/ripetizioni possono
+variare da allenamento a allenamento.\newline\newline
+Una \textbf{richiesta di sessione di allenamento }con il PT
+deve contenere un riferimento all'atleta che la richiede, data e ora
+della sessione e la motivazione della sessione (ad esempio dubbi
+sull'esecuzione degli esercizi).\newline\newline
+Si prevede l'utilizzo di un \textbf{database} per la gestione dei
+dati dell'applicativo.
+\end{document}

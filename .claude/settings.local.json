@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f SoftwareRequirementsSpecification.synctex.gz \"SoftwareRequirementsSpecification.synctex\\(busy\\)\")",
+      "Bash(latexmk -pdf -interaction=nonstopmode -halt-on-error SoftwareRequirementsSpecification.tex)"
+    ]
+  }
+}

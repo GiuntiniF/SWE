@@ -1,0 +1,66 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-04} \\ \hline
+  \ucname{Configurazione Sessioni di Allenamento in Template
+    di Scheda} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Il PT inserisce o modifica gli
+    allenamenti presenti in una scheda.} \\ \hline
+  \ucprecond{Il PT deve essere loggato e deve
+    essere presente almeno un template di scheda da modificare.} \\ \hline
+  \ucpostcond{Vengono configurati gli allenamenti in
+    un template di una scheda.} \\ \hline
+  \ucmainflow{
+    \item Il PT atterra sulla pagina di configurazione delle
+      sessioni di allenamento.
+    \item Il sistema mostra la lista di sessioni di allenamento presenti.
+    \item Il PT preme su una delle sessioni di allenamento.
+    \item Il sistema mostra il dettaglio della sessione di allenamento corrente.
+    \item Il PT preme il tasto "Aggiungi Esercizio".
+    \item Il sistema mostra una lista di esercizi.
+    \item Il PT sceglie un esercizio dalla lista.
+    \item Il sistema mostra il form di inserimento dettagli esercizio.
+    \item Il PT configura l'esercizio inserendo:
+      \begin{itemize}
+        \item Numero di serie/ripetizioni.
+        \item Tempo di recupero tra una serie e l'altra (in secondi).
+        \item Variante di esecuzione se presente (superserie, dropset,
+          rest-pause etc...).
+        \item Tipo di progressione se presente (di carico, di volume,
+          doppia progressione o di densità).
+        \item Altre note esecutive.
+      \end{itemize}
+    \item Il PT preme il tasto "Aggiungi Esercizio".
+    \item Il sistema aggiunge l'esercizio alla sessione.
+    \item Il flusso riprende dal punto 4.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{5a. Modifica esercizio} \newline
+    - Invece di aggiungere un nuovo esercizio il PT preme su
+    un'esercizio già presente e modifica quello. \newline
+    - Il flusso riprende dal punto 4. \newline
+    \textbf{5b. Modifica sessione scelta} \newline
+    - Il PT decide di modificare un'altra sessione di
+    allenamento invece di quella corrente.\newline
+    - Il flusso riprende dal punto 1.
+  } \\ \hline
+  \ucvariations{
+    \textbf{9a. Selezione variante di esecuzione} \newline
+    - Se viene selezionata una variante potrebbero essere richiesti dati
+    aggiuntivi (es. altri esercizi da effettuare in superserie, tempo di recupero
+    tra una miniserie e l'altra nel rest-pause etc..).\newline
+    \textbf{9b. Selezione tipo di progressione}\newline
+    - Se viene selezionata una variante potrebbero essere richiesti
+    dati aggiuntivi (es. modifica settimanale del peso nella
+      progressione di carico, delle serie/ripetizioni nella
+      progressione di volume, di entrambi nella doppia progressione, o
+    del tempo di esecuzione in quella di densità.)
+  } \\ \hline
+\end{tabularx}
+\end{document}

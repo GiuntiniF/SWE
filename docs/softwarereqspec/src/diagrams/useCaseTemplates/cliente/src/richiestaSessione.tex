@@ -1,0 +1,37 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{A-03} \\ \hline
+  \ucname{Richiesta Sessione di Allenamento} \\ \hline
+  \ucactor{Atleta registrato} \\ \hline
+  \ucdescription{L'atleta richiede una sessione di
+    allenamento con il PT fornendo data e motivazione.} \\ \hline
+  \ucprecond{L'atleta deve essere autenticato.} \\ \hline
+  \ucpostcond{Viene creata una sessione di
+    allenamento in attesa di conferma dal PT, il quale riceve
+    una mail di notifica.} \\ \hline
+  \ucmainflow{
+    \item L'atleta atterra sulla pagina della lista sessioni prenotate.
+    \item L'atleta preme il tasto "Richiedi Appuntamento".
+    \item Il sistema mostra il form di richiesta appuntamento.
+    \item L'atleta inserisce i dati necessari, in particolare data e ora
+      della sessione e la motivazione.
+    \item L'atleta preme il tasto "Invia Richiesta".
+    \item Il sistema verifica i dati nel database.
+    \item Il sistema salva nel database la richiesta di sessione.
+    \item Il sistema invia al PT una mail per informarlo
+      della nuova richiesta.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{6a. Richiesta in attesa già presente} \newline
+    - Il sistema mostra un messaggio di errore ("C'è già una richiesta
+    di sessione in attesa di risposta."). \newline
+    - Il flusso riprende dal punto 1. \newline
+  } \\ \hline
+\end{tabularx}
+\end{document}

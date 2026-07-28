@@ -1,0 +1,29 @@
+% Macro per la struttura dei template dei casi d'uso.
+% Richiede: tabularx, enumitem (gia' caricati nel preambolo principale).
+%
+% NOTA: tabularx (colonne di tipo X) scansiona i token "&" e "\\" senza
+% espanderli, per calcolare la larghezza delle celle. Per questo motivo
+% \begin{tabularx}...\end{tabularx} e il "\\ \hline" di fine riga NON
+% possono essere nascosti dentro una macro o un environment: vanno
+% scritti letteralmente in ciascun file che usa queste macro. Le macro
+% coprono solo il contenuto della singola riga (etichetta in grassetto
+% + "&" + contenuto).
+
+\newcommand{\ucstart}{\renewcommand{\arraystretch}{1.5}\noindent}
+
+\newcommand{\ucid}[1]{\textbf{ID Caso d'Uso} & \textbf{#1}}
+\newcommand{\ucname}[1]{\textbf{Nome} & #1}
+\newcommand{\ucactor}[1]{\textbf{Attore Primario} & #1}
+\newcommand{\ucsecondaryactor}[1]{\textbf{Attore Secondario} & #1}
+\newcommand{\ucdescription}[1]{\textbf{Descrizione} & #1}
+\newcommand{\ucprecond}[1]{\textbf{Pre-condizioni} & #1}
+\newcommand{\ucpostcond}[1]{\textbf{Post-condizioni} & #1}
+\newcommand{\ucmainflow}[1]{%
+  \textbf{Flusso Principale} &
+  \begin{enumerate}[topsep=0pt,partopsep=6pt,before=\vspace*{-\baselineskip}]
+    #1
+  \end{enumerate}%
+}
+\newcommand{\ucaltflow}[1]{\textbf{Flussi Alternativi} & #1}
+\newcommand{\ucnote}[1]{\textbf{Note} & #1}
+\newcommand{\ucvariations}[1]{\textbf{Variazioni} & #1}

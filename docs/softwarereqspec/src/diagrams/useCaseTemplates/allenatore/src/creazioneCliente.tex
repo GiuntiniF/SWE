@@ -1,0 +1,47 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-02} \\ \hline
+  \ucname{Registrazione nuovo Atleta} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucsecondaryactor{Atleta da Registrare} \\ \hline
+  \ucdescription{Il PT crea un account all'atleta da
+    registrare, e l'Atleta completa la registrazione.} \\ \hline
+  \ucprecond{Il PT deve essere loggato e deve
+    avere la mail dell'atleta da registrare.} \\ \hline
+  \ucpostcond{L'atleta è registrato nell'applicativo.} \\ \hline
+  \ucmainflow{
+    \item Il PT atterra sulla pagina di crezione nuovo atleta.
+    \item Il sistema mostra il form di inserimento dati dell'atleta
+      (nome, cognome e mail).
+    \item Il PT inserisce i dati.
+    \item Il PT preme il pulsante "Crea atleta".
+    \item Il sistema verifica che la mail non sia già presente nel database.
+    \item Il sistema mostra una pagina di conferma creazione.
+    \item Il sistema invia una mail all'atleta con le istruzioni al
+      primo login e una password temporanea e monouso.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{5a. Email già presente} \newline
+    - Il sistema mostra un messaggio di errore ("Atleta con questa
+    email già presente"). \newline
+    - Il flusso riprende dal punto 2. \newline
+    \textbf{12a. Email errata} \newline
+    - Il sistema mostra un messaggio di errore ("Email non valida"). \newline
+    - Il flusso riprende dal punto 9. \newline
+    \textbf{16a. Password temporanea errata} \newline
+    - Il sistema mostra un messaggio di errore ("Password errata"). \newline
+    - Il flusso riprende dal punto 13. \newline
+    \textbf{16b. Password temporanea scaduta} \newline
+    - Il sistema mostra un messaggio di errore ("Password temporanea
+    scaduta, contattare il proprio PT"). \newline
+    - Il flusso si interrompe finché non viene inviata una nuova
+    password temporanea all'atleta.
+  } \\ \hline
+\end{tabularx}
+\end{document}

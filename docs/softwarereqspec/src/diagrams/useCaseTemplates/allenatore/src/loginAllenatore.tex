@@ -1,0 +1,45 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-01} \\ \hline
+  \ucname{Login PT} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Il PT inserisce le proprie credenziali
+    per accedere al sistema.} \\ \hline
+  \ucprecond{Il PT deve essere registrato e avere un account valido.} \\ \hline
+  \ucpostcond{Il PT è autenticato e può utilizzare
+    le funzioni dell'applicativo.} \\ \hline
+  \ucmainflow{
+    \item Il PT atterra sulla pagina di login
+    \item Il sistema mostra il form di inserimento email.
+    \item Il PT inserisce la email.
+    \item Il PT preme il pulsante "Continua".
+    \item Il sistema verifica la mail nel database.
+    \item Il sistema invia una mail al PT con un codice di
+      conferma temporaneo.
+    \item Il sistema mostra il form di inserimento del codice di conferma.
+    \item Il PT inserisce il codice di conferma.
+    \item Il PT preme il pulsante "Accedi".
+    \item Il sistema verifica il codice di conferma nel database.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{5a. Email errata:} \newline
+    - Il sistema mostra un messaggio di errore ("Email non valida"). \newline
+    - Il flusso riprende dal punto 2. \newline
+    \textbf{9a. Codice di conferma errato:} \newline
+    - Il sistema mostra un messaggio di errore ("Codice di conferma non
+    valido"). \newline
+    - Il flusso riprende dal punto 8. \newline
+    \textbf{9b. Codice di conferma scaduto:} \newline
+    - Il sistema mostra un messaggio di errore ("Codice di conferma
+    scaduto"). \newline
+    - Il flusso riprende dal punto 2 in quanto si deve richiedere
+    l'invio di un nuovo codice.
+  } \\ \hline
+\end{tabularx}
+\end{document}

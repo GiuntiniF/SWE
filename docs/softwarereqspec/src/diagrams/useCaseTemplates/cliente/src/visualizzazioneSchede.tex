@@ -1,0 +1,33 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{A-04} \\ \hline
+  \ucname{Visualizzazione Schede Assegnate} \\ \hline
+  \ucactor{Atleta registrato} \\ \hline
+  \ucdescription{L'atleta visualizza l'elenco delle schede di
+    allenamento che gli sono state assegnate dal proprio PT.} \\ \hline
+  \ucprecond{L'atleta deve essere autenticato e deve
+    avere almeno una scheda assegnata.} \\ \hline
+  \ucpostcond{L'atleta visualizza l'elenco delle schede
+    assegnate e i relativi dettagli.} \\ \hline
+  \ucmainflow{
+    \item L'atleta atterra sulla pagina delle schede.
+    \item Il sistema mostra l'elenco delle schede di allenamento
+      assegnate, con nome, date e stato.
+    \item L'atleta seleziona una scheda per visualizzarne i dettagli.
+    \item Il sistema mostra il dettaglio della scheda, con i mesi,
+      le sessioni di allenamento e gli esercizi previsti.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{2a. Nessuna scheda assegnata} \newline
+    - Il sistema mostra un messaggio ("Nessuna scheda di allenamento
+    assegnata"). \newline
+    - Il flusso termina.
+  } \\ \hline
+\end{tabularx}
+\end{document}

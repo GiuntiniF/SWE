@@ -1,0 +1,31 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-07} \\ \hline
+  \ucname{Visualizzazione Sessioni Prenotate} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Il PT visualizza l'elenco delle sessioni di
+    allenamento prenotate con i propri atleti.} \\ \hline
+  \ucprecond{Il PT deve essere autenticato.} \\ \hline
+  \ucpostcond{Il PT visualizza l'elenco delle sessioni
+    prenotate.} \\ \hline
+  \ucmainflow{
+    \item Il PT atterra sulla pagina delle sessioni prenotate.
+    \item Il sistema mostra l'elenco delle sessioni prenotate con i
+      propri atleti, divise per stato (confermate, in attesa, rifiutate).
+    \item Il PT può selezionare una sessione per visualizzarne i dettagli.
+    \item Il sistema mostra i dettagli della sessione, tra cui atleta,
+      data, ora e motivazione.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{3a. Nessuna sessione presente} \newline
+    - Il sistema mostra un messaggio ("Nessuna sessione prenotata"). \newline
+    - Il flusso termina.
+  } \\ \hline
+\end{tabularx}
+\end{document}
