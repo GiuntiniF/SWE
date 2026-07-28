@@ -2,14 +2,27 @@
   "permissions": {
     "allow": [
       "Bash(rm -f SoftwareRequirementsSpecification.synctex.gz \"SoftwareRequirementsSpecification.synctex\\(busy\\)\")",
-      "Bash(latexmk -pdf -interaction=nonstopmode -halt-on-error SoftwareRequirementsSpecification.tex)"
+      "Bash(latexmk -pdf -interaction=nonstopmode -halt-on-error SoftwareRequirementsSpecification.tex)",
+      "Bash(find / -maxdepth 6 -iname \"*triage*\" -path \"*skills*\")",
+      "Read(//home/francesco/.claude/**)",
+      "Bash(git check-ignore *)"
     ],
     "deny": [
       "Read(./docs/modello/*.gaphor)",
-      "Read(./**/*.svg)", "Read(./**/*.pdf)",
-      "Read(./**/*.png)", "Read(./**/*.jpg)", "Read(./**/*.jpeg)",
-      "Read(./**/*.gif)", "Read(./**/*.webp)", "Read(./**/*.bmp)",
-      "Read(./**/*.aux)", "Read(./**/*.fls)", "Read(./**/*.fdb_latexmk)"
+      "Read(./**/*.svg)",
+      "Read(./**/*.pdf)",
+      "Read(./**/*.png)",
+      "Read(./**/*.jpg)",
+      "Read(./**/*.jpeg)",
+      "Read(./**/*.gif)",
+      "Read(./**/*.webp)",
+      "Read(./**/*.bmp)",
+      "Read(./**/*.aux)",
+      "Read(./**/*.fls)",
+      "Read(./**/*.fdb_latexmk)"
     ]
+  },
+  "enabledPlugins": {
+    "mattpocock-skills@claude-plugins-official": true
   }
 }
