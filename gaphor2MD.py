@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
 """
-gaphor2MD - Estrae uno strato semantico Markdown dai modelli Gaphor (.gaphor).
+gaphor2md - Estrae uno strato semantico Markdown dai modelli Gaphor (.gaphor).
 
-Il formato .gaphor e' XML: ogni elemento del modello e' un tag di primo livello
-il cui nome coincide con la metaclasse UML. Le proprieta' sono espresse come:
+Compatibile con il formato file v4 (Gaphor 3.x) e con il vecchio formato 2.x.
+
+Il file .gaphor e' XML: ogni elemento del modello e' un tag il cui nome coincide
+con la metaclasse UML. Le proprieta' seguono tre soli schemi:
 
     <name><val>Utente</val></name>                 -> valore scalare
-    <class_><ref refid="abc"/></class_>            -> riferimento singolo
+    <owningPackage><ref refid="abc"/></owningPackage>  -> riferimento singolo
     <ownedAttribute><reflist><ref .../></reflist>  -> collezione di riferimenti
 
-Lo script ignora completamente gli elementi di presentazione (geometria,
-matrici, stili) e produce un Markdown compatto pensato per essere letto da un
-LLM: indice dei diagrammi, elementi raggruppati per package, tabella unica
-delle relazioni.
+Differenze del formato v4 gestite qui:
+  * gli elementi stanno dentro un wrapper <model>, non sotto la radice;
+  * namespace per linguaggio di modellazione (UML:, Core:, ...);
+  * le molteplicita' sono riferimenti a LiteralInteger / LiteralUnlimitedNatural;
+  * i diagrammi sono metaclassi distinte (ClassDiagram, UseCaseDiagram, ...);
+  * le descrizioni stanno nel campo `note` degli elementi.
 
 Esempi:
-    python gaphor2MD.py modello.gaphor -o docs/model
-    python gaphor2MD.py -r src/ -o docs/model --single-file
-    python gaphor2MD.py -r src/ -o docs/model --check   # per la CI
+    python gaphor2md.py modello.gaphor -o docs/model
+    python gaphor2md.py -r src/ -o docs/model --singleFile
+    python gaphor2md.py -r src/ -o docs/model --check   # per la CI
 """
 
 from __future__ import annotations
@@ -56,6 +60,9 @@ NESTED_TYPES = {
     "LiteralSpecification",
     "LiteralString",
     "LiteralInteger",
+    "LiteralUnlimitedNatural",
+    "LiteralBoolean",
+    "ValueSpecification",
 }
 
 # Elementi puramente tecnici, privi di contenuto semantico.
@@ -69,32 +76,49 @@ IGNORED_TYPES = {
     "RefChange",
 }
 
-# Relazioni: (tipo -> (attributo sorgente, attributo destinazione)).
-# Il primo nome trovato tra quelli elencati viene usato.
+# Relazioni: tipo -> (chiavi origine, chiavi destinazione).
+# Viene usata la prima chiave presente sull'elemento, cosi' lo stesso mapping
+# copre nomi diversi tra le versioni di Gaphor.
 RELATION_ENDS = {
     "Generalization": (("specific",), ("general",)),
     "Dependency": (("client",), ("supplier",)),
     "Usage": (("client",), ("supplier",)),
-    "Realization": (("client",), ("supplier",)),
+    "Realization": (("realizingClassifier", "client"), ("abstraction", "supplier")),
     "Abstraction": (("client",), ("supplier",)),
-    "Substitution": (("substitutingClassifier",), ("contract",)),
-    "InterfaceRealization": (("implementatingClassifier", "client"), ("contract", "supplier")),
+    "Substitution": (("substitutingClassifier", "client"), ("contract", "supplier")),
+    "InterfaceRealization": (
+        ("implementingClassifier", "implementatingClassifier", "client"),
+        ("contract", "supplier"),
+    ),
     "Include": (("includingCase",), ("addition",)),
     "Extend": (("extension",), ("extendedCase",)),
     "Transition": (("source",), ("target",)),
     "ControlFlow": (("source",), ("target",)),
     "ObjectFlow": (("source",), ("target",)),
-    "Connector": (("end",), ()),
-    "Extension": (("ownedEnd",), ()),
     "PackageImport": (("importingNamespace",), ("importedPackage",)),
     "Message": (("sendEvent",), ("receiveEvent",)),
+    "Connector": (("end",), ()),
+    "Extension": (("ownedEnd",), ()),
     "CommunicationPath": ((), ()),
 }
 
 RELATION_TYPES = set(RELATION_ENDS) | {"Association"}
 
-DIAGRAM_TYPE_LABELS = {
-    "": "generico",
+# Etichette per i diagrammi: chiavi sia per metaclasse (v4) sia per
+# l'attributo diagramType (v2.x).
+DIAGRAM_LABELS = {
+    "Diagram": "generico",
+    "ClassDiagram": "classi",
+    "PackageDiagram": "package",
+    "ComponentDiagram": "componenti",
+    "DeploymentDiagram": "deployment",
+    "ActivityDiagram": "attivita'",
+    "SequenceDiagram": "sequenza",
+    "CommunicationDiagram": "comunicazione",
+    "StateMachineDiagram": "macchina a stati",
+    "UseCaseDiagram": "casi d'uso",
+    "ProfileDiagram": "profilo",
+    "ObjectDiagram": "oggetti",
     "cls": "classi",
     "uc": "casi d'uso",
     "pkg": "package",
@@ -110,8 +134,23 @@ DIAGRAM_TYPE_LABELS = {
 
 PACKAGE_TYPES = {"Package", "Model", "Profile"}
 
-# Attributi che identificano il contenitore di un elemento, in ordine di preferenza.
-OWNER_KEYS = ("package", "owningPackage", "namespace", "owner", "nestingPackage")
+# Attributi che identificano il contenitore, in ordine di preferenza.
+# v4 usa owningPackage / structuredClassifier; v2.x usava package / class_.
+OWNER_KEYS = (
+    "owningPackage",
+    "package",
+    "nestingPackage",
+    "structuredClassifier",
+    "class",
+    "interface",
+    "enumeration",
+    "datatype",
+    "owningClassifier",
+    "ownerFormalParam",
+    "namespace",
+    "owner",
+    "element",
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -134,7 +173,6 @@ class ModelElement:
         return (self.values.get("name") or "").strip()
 
     def firstRef(self, *keys: str) -> str | None:
-        """Primo riferimento disponibile tra le chiavi indicate."""
         for key in keys:
             if key in self.refs:
                 return self.refs[key]
@@ -143,26 +181,34 @@ class ModelElement:
                 return values[0]
         return None
 
-    def allRefs(self, *keys: str) -> list[str]:
-        out: list[str] = []
-        for key in keys:
-            if key in self.refs:
-                out.append(self.refs[key])
-            out.extend(self.refLists.get(key, []))
-        return out
-
 
 def stripNamespace(tag: str) -> str:
     return tag.split("}", 1)[-1]
 
 
 def normalizeName(tag: str) -> str:
-    """`class_` -> `class`: Gaphor aggiunge un underscore alle keyword Python."""
+    """`class_` -> `class`: Gaphor accoda un underscore alle keyword Python."""
     return stripNamespace(tag).rstrip("_")
 
 
 def textOf(node: ET.Element) -> str:
     return "".join(node.itertext()).strip()
+
+
+def iterModelNodes(root: ET.Element):
+    """
+    Restituisce i nodi degli elementi del modello.
+
+    Nel formato v4 sono figli di un wrapper <model>; nel formato 2.x sono
+    figli diretti della radice <gaphor>. Gestiamo entrambi senza dipendere
+    dall'URI del namespace, cambiato tra le versioni.
+    """
+    wrappers = [child for child in root if stripNamespace(child.tag) == "model"]
+    if wrappers:
+        for wrapper in wrappers:
+            yield from wrapper
+    else:
+        yield from root
 
 
 def parseGaphorFile(path: Path) -> dict[str, ModelElement]:
@@ -173,7 +219,7 @@ def parseGaphorFile(path: Path) -> dict[str, ModelElement]:
         raise ValueError(f"XML non valido in {path}: {exc}") from exc
 
     elements: dict[str, ModelElement] = {}
-    for node in root:
+    for node in iterModelNodes(root):
         elemId = node.get("id")
         if not elemId:
             continue
@@ -204,11 +250,15 @@ def parseGaphorFile(path: Path) -> dict[str, ModelElement]:
 
 def isPresentation(element: ModelElement) -> bool:
     """True per gli item grafici (geometria/stile), da scartare."""
-    if "matrix" in element.values or "canvas" in element.refs:
+    if "matrix" in element.values:
         return True
-    if element.elemType.endswith(("Item", "Line", "Box")):
+    if element.elemType.endswith(("Item", "Line", "Box", "Ellipse")):
         return True
     return "diagram" in element.refs and "subject" in element.refs
+
+
+def isDiagram(element: ModelElement) -> bool:
+    return element.elemType == "Diagram" or element.elemType.endswith("Diagram")
 
 
 # --------------------------------------------------------------------------- #
@@ -230,10 +280,26 @@ class ModelIndex:
             if eid not in self.presentations and el.elemType not in IGNORED_TYPES
         }
         self.diagrams = {
-            eid: el for eid, el in self.semantic.items() if el.elemType == "Diagram"
+            eid: el for eid, el in self.semantic.items() if isDiagram(el)
         }
+        self.associationEnds = self._indexAssociationEnds()
         self.commentsByTarget = self._indexComments()
         self.diagramMembership = self._indexDiagramMembership()
+
+    def _indexAssociationEnds(self) -> set[str]:
+        """Property che fanno da estremo di un'associazione: non sono attributi."""
+        ends: set[str] = set()
+        for element in self.semantic.values():
+            if element.elemType != "Association":
+                continue
+            ends.update(element.refLists.get("memberEnd", []))
+            ends.update(element.refLists.get("ownedEnd", []))
+        for element in self.semantic.values():
+            if element.elemType == "Property" and (
+                "association" in element.refs or "owningAssociation" in element.refs
+            ):
+                ends.add(element.elemId)
+        return ends
 
     def _indexComments(self) -> dict[str, list[str]]:
         out: dict[str, list[str]] = {}
@@ -243,22 +309,24 @@ class ModelIndex:
             body = (element.values.get("body") or "").strip()
             if not body:
                 continue
-            for targetId in element.allRefs("annotatedElement"):
+            for targetId in element.refLists.get("annotatedElement", []):
                 out.setdefault(targetId, []).append(body)
         return out
 
     def _indexDiagramMembership(self) -> dict[str, list[str]]:
-        """diagramId -> lista di id di elementi semantici presenti sul diagramma."""
+        """diagramId -> id degli elementi semantici presenti sul diagramma."""
         out: dict[str, list[str]] = {did: [] for did in self.diagrams}
         for presentation in self.presentations.values():
             subjectId = presentation.refs.get("subject")
             if not subjectId:
                 continue
             diagramId = presentation.refs.get("diagram")
-            if diagramId is None:
-                # Formati piu' vecchi: il diagramma elenca le presentazioni.
+            if diagramId not in out:
+                # Formati piu' vecchi: e' il diagramma a elencare le presentazioni.
                 for did, diagram in self.diagrams.items():
-                    if presentation.elemId in diagram.refLists.get("ownedPresentation", []):
+                    if presentation.elemId in diagram.refLists.get(
+                        "ownedPresentation", []
+                    ):
                         diagramId = did
                         break
             if diagramId in out and subjectId not in out[diagramId]:
@@ -268,13 +336,34 @@ class ModelIndex:
     def get(self, elemId: str | None) -> ModelElement | None:
         return self.elements.get(elemId) if elemId else None
 
-    def nameOf(self, elemId: str | None, fallback: str = "?") -> str:
+    def nameOf(self, elemId: str | None, fallback: str = "?", depth: int = 0) -> str:
         element = self.get(elemId)
         if element is None:
             return fallback
         if element.name:
             return element.name
+        # Una relazione senza nome (es. una dipendenza che punta a un'altra
+        # dipendenza) viene descritta tramite i suoi estremi.
+        if depth < 2 and element.elemType in RELATION_TYPES:
+            return f"{element.elemType}[{relationLabel(self, element, depth + 1)}]"
         return f"({element.elemType.lower()} anonimo)"
+
+    def literalValue(self, elemId: str | None) -> str:
+        """Valore di un LiteralInteger / LiteralUnlimitedNatural (formato v4)."""
+        element = self.get(elemId)
+        if element is None:
+            return ""
+        return (element.values.get("value") or element.values.get("name") or "").strip()
+
+    def boundOf(self, element: ModelElement, key: str) -> str | None:
+        """
+        Estremo di molteplicita'. In v4 e' un riferimento a un Literal*,
+        in 2.x era un valore inline.
+        """
+        if key in element.refs:
+            value = self.literalValue(element.refs[key])
+            return value or None
+        return element.values.get(key)
 
     def typeNameOf(self, element: ModelElement) -> str:
         """Tipo di una Property/Parameter: per riferimento o come stringa libera."""
@@ -284,17 +373,42 @@ class ModelIndex:
         return (element.values.get("typeValue") or "").strip()
 
     def ownerOf(self, element: ModelElement) -> ModelElement | None:
-        ownerId = element.firstRef(*OWNER_KEYS)
-        owner = self.get(ownerId)
-        if owner is not None and owner.elemType in PACKAGE_TYPES:
-            return owner
-        # Risalita: se il proprietario non e' un package, cerca il suo.
-        if owner is not None and owner is not element:
-            return self.ownerOf(owner)
+        """Risale la catena di contenimento fino al primo Package."""
+        seen: set[str] = set()
+        current: ModelElement | None = element
+        while current is not None and current.elemId not in seen:
+            seen.add(current.elemId)
+            ownerId = current.firstRef(*OWNER_KEYS)
+            owner = self.get(ownerId)
+            if owner is None:
+                return None
+            if owner.elemType in PACKAGE_TYPES:
+                return owner
+            current = owner
         return None
 
-    def commentsFor(self, elemId: str) -> list[str]:
-        return self.commentsByTarget.get(elemId, [])
+    def packagePath(self, package: ModelElement | None) -> str:
+        """Nome qualificato del package: `App PT / Domain Model / Exercises`."""
+        if package is None:
+            return "(root)"
+        parts: list[str] = []
+        seen: set[str] = set()
+        current: ModelElement | None = package
+        while current is not None and current.elemId not in seen:
+            seen.add(current.elemId)
+            parts.append(current.name or "(anonimo)")
+            parent = self.get(current.firstRef("owningPackage", "nestingPackage", "package"))
+            current = parent if parent is not None and parent.elemType in PACKAGE_TYPES else None
+        return " / ".join(reversed(parts))
+
+    def descriptionsFor(self, element: ModelElement) -> list[str]:
+        """Note dell'elemento (v4) piu' eventuali Comment collegati."""
+        out: list[str] = []
+        note = (element.values.get("note") or "").strip()
+        if note:
+            out.append(note)
+        out.extend(self.commentsByTarget.get(element.elemId, []))
+        return out
 
 
 # --------------------------------------------------------------------------- #
@@ -302,9 +416,9 @@ class ModelIndex:
 # --------------------------------------------------------------------------- #
 
 
-def multiplicityOf(element: ModelElement) -> str:
-    lower = element.values.get("lowerValue")
-    upper = element.values.get("upperValue")
+def multiplicityOf(index: ModelIndex, element: ModelElement) -> str:
+    lower = index.boundOf(element, "lowerValue")
+    upper = index.boundOf(element, "upperValue")
     if lower is None and upper is None:
         return ""
     if lower is not None and lower == upper:
@@ -320,8 +434,8 @@ def escapePipes(text: str) -> str:
     return text.replace("|", "\\|")
 
 
-def flattenText(text: str, limit: int = 400) -> str:
-    """Testo su una riga sola: le tabelle Markdown non tollerano gli a capo."""
+def flattenText(text: str, limit: int = 300) -> str:
+    """Testo su una riga: le tabelle Markdown non tollerano gli a capo."""
     collapsed = re.sub(r"\s+", " ", text).strip()
     if len(collapsed) > limit:
         collapsed = collapsed[: limit - 1].rstrip() + "…"
@@ -329,31 +443,31 @@ def flattenText(text: str, limit: int = 400) -> str:
 
 
 def renderAttributes(index: ModelIndex, owner: ModelElement) -> list[str]:
-    propertyIds = owner.refLists.get("ownedAttribute", [])
     rows: list[str] = []
-    for propId in propertyIds:
+    for propId in owner.refLists.get("ownedAttribute", []):
         prop = index.get(propId)
         if prop is None or prop.elemType != "Property":
             continue
-        if prop.refs.get("association") or prop.refs.get("owningAssociation"):
-            continue  # e' un end di associazione, compare nella tabella relazioni
+        if propId in index.associationEnds:
+            continue  # compare nella tabella delle relazioni
         typeName = index.typeNameOf(prop) or "—"
-        mult = multiplicityOf(prop)
-        default = prop.values.get("defaultValue", "")
-        flags = []
-        if prop.values.get("isStatic") == "1":
-            flags.append("static")
-        if prop.values.get("isDerived") == "1":
-            flags.append("derived")
-        if prop.values.get("isReadOnly") == "1":
-            flags.append("readonly")
+        mult = multiplicityOf(index, prop)
+        flags = [
+            label
+            for key, label in (
+                ("isStatic", "static"),
+                ("isDerived", "derived"),
+                ("isReadOnly", "readonly"),
+            )
+            if prop.values.get(key) == "1"
+        ]
         rows.append(
             "| {vis} | {name} | {type} | {mult} | {default} | {flags} |".format(
                 vis=visibilityOf(prop),
                 name=escapePipes(prop.name or "—"),
                 type=escapePipes(typeName),
                 mult=mult or "—",
-                default=escapePipes(default) or "—",
+                default=escapePipes(prop.values.get("defaultValue", "")) or "—",
                 flags=", ".join(flags) or "—",
             )
         )
@@ -390,11 +504,11 @@ def renderOperations(index: ModelIndex, owner: ModelElement) -> list[str]:
             prefix = "" if direction == "in" else f"{direction} "
             label = f"{prefix}{param.name}" if param.name else prefix.strip() or "?"
             params.append(f"{label}: {typeName}" if typeName else label)
-        flags = []
-        if operation.values.get("isAbstract") == "1":
-            flags.append("abstract")
-        if operation.values.get("isStatic") == "1":
-            flags.append("static")
+        flags = [
+            label
+            for key, label in (("isAbstract", "abstract"), ("isStatic", "static"))
+            if operation.values.get(key) == "1"
+        ]
         rows.append(
             "| {vis} | {sig} | {ret} | {flags} |".format(
                 vis=visibilityOf(operation),
@@ -438,8 +552,8 @@ def renderElement(
         header += f" *<<{', '.join(stereotypes)}>>*"
 
     lines = [header]
-    for comment in index.commentsFor(element.elemId):
-        lines += ["", comment.strip()]
+    for description in index.descriptionsFor(element):
+        lines += ["", description.strip()]
 
     lines += renderAttributes(index, element)
     lines += renderOperations(index, element)
@@ -450,7 +564,7 @@ def renderElement(
     return lines
 
 
-def relationLabel(index: ModelIndex, element: ModelElement) -> str:
+def relationLabel(index: ModelIndex, element: ModelElement, depth: int = 0) -> str:
     """Etichetta leggibile per una relazione, che tipicamente non ha nome."""
     if element.elemType == "Association":
         ends = [index.get(pid) for pid in element.refLists.get("memberEnd", [])]
@@ -458,8 +572,12 @@ def relationLabel(index: ModelIndex, element: ModelElement) -> str:
         label = " — ".join(names[:2]) if len(names) >= 2 else "?"
     else:
         sourceKeys, targetKeys = RELATION_ENDS.get(element.elemType, ((), ()))
-        source = index.nameOf(element.firstRef(*sourceKeys), "?") if sourceKeys else "?"
-        target = index.nameOf(element.firstRef(*targetKeys), "?") if targetKeys else "?"
+        source = (
+            index.nameOf(element.firstRef(*sourceKeys), "?", depth) if sourceKeys else "?"
+        )
+        target = (
+            index.nameOf(element.firstRef(*targetKeys), "?", depth) if targetKeys else "?"
+        )
         label = f"{source} → {target}"
     return f"{element.name} ({label})" if element.name else label
 
@@ -472,22 +590,21 @@ def renderAssociation(index: ModelIndex, association: ModelElement) -> str | Non
     descriptions = []
     for end in ends[:2]:
         classifier = index.typeNameOf(end) or "?"
-        mult = multiplicityOf(end)
-        role = end.name
+        mult = multiplicityOf(index, end)
         label = classifier
         if mult:
             label += f" [{mult}]"
-        if role:
-            label += f" ({role})"
+        if end.name:
+            label += f" ({end.name})"
         descriptions.append(label)
 
     details = []
+    if association.name:
+        details.append(f"nome: {association.name}")
     for end in ends[:2]:
         aggregation = AGGREGATION_SYMBOLS.get(end.values.get("aggregation", ""))
         if aggregation:
             details.append(f"{aggregation} lato {index.typeNameOf(end) or '?'}")
-    if association.name:
-        details.insert(0, f"nome: {association.name}")
 
     return "| Association | {a} | {b} | {details} |".format(
         a=escapePipes(descriptions[0]),
@@ -514,16 +631,14 @@ def renderRelations(index: ModelIndex) -> list[str]:
         details = []
         if element.name:
             details.append(f"nome: {element.name}")
-        guard = element.values.get("guard") or element.refs.get("guard")
-        if guard and isinstance(guard, str) and guard in index.elements:
-            guardText = index.elements[guard].values.get("specification", "")
-            if guardText:
-                details.append(f"guardia: {guardText}")
+        note = (element.values.get("note") or "").strip()
+        if note:
+            details.append(flattenText(note, 120))
         rows.append(
             "| {kind} | {a} | {b} | {details} |".format(
                 kind=element.elemType,
-                a=escapePipes(index.nameOf(sourceId, "—")),
-                b=escapePipes(index.nameOf(targetId, "—")),
+                a=escapePipes(index.nameOf(sourceId, "—", 1)),
+                b=escapePipes(index.nameOf(targetId, "—", 1)),
                 details=escapePipes("; ".join(details)) or "—",
             )
         )
@@ -548,10 +663,12 @@ def renderDiagramIndex(index: ModelIndex) -> list[str]:
         index.diagrams.items(), key=lambda kv: kv[1].name.lower()
     ):
         rawType = diagram.values.get("diagramType", "")
-        label = DIAGRAM_TYPE_LABELS.get(rawType, rawType or "generico")
+        label = DIAGRAM_LABELS.get(diagram.elemType) or DIAGRAM_LABELS.get(
+            rawType, rawType or "generico"
+        )
         lines.append(f"### {diagram.name or '(diagramma senza nome)'} — *{label}*")
-        for comment in index.commentsFor(diagramId):
-            lines += ["", comment.strip()]
+        for description in index.descriptionsFor(diagram):
+            lines += ["", description.strip()]
         lines.append("")
 
         byType: dict[str, list[str]] = {}
@@ -580,12 +697,11 @@ def renderDiagramIndex(index: ModelIndex) -> list[str]:
 def renderElementsByPackage(index: ModelIndex) -> list[str]:
     groups: dict[str, list[ModelElement]] = {}
     for element in index.semantic.values():
-        if element.elemType in NESTED_TYPES | RELATION_TYPES:
+        if element.elemType in NESTED_TYPES | RELATION_TYPES | PACKAGE_TYPES:
             continue
-        if element.elemType in {"Diagram", "Comment"} | PACKAGE_TYPES:
+        if element.elemType == "Comment" or isDiagram(element):
             continue
-        owner = index.ownerOf(element)
-        key = owner.name if owner is not None and owner.name else "(root)"
+        key = index.packagePath(index.ownerOf(element))
         groups.setdefault(key, []).append(element)
 
     if not groups:
@@ -611,13 +727,13 @@ def renderModelMarkdown(index: ModelIndex, sourcePath: Path, sourceHash: str) ->
         "---",
         f"source: {sourcePath.name}",
         f"sourceHash: {sourceHash}",
-        "generator: gaphor2MD",
+        "generator: gaphor2md",
         "---",
         "",
         f"# Modello: {sourcePath.stem}",
         "",
         "Strato semantico generato automaticamente dal file Gaphor. "
-        "Non modificare a mano: rigenerare con `gaphor2MD.py`.",
+        "Non modificare a mano: rigenerare con `gaphor2md.py`.",
         "",
         "| Tipo | Conteggio |",
         "| --- | --- |",
@@ -695,6 +811,10 @@ def buildParser() -> argparse.ArgumentParser:
         "--check", action="store_true",
         help="non scrive nulla; esce con 1 se il Markdown e' disallineato (uso in CI)",
     )
+    parser.add_argument(
+        "--stats", action="store_true",
+        help="stampa un riepilogo diagnostico del parsing",
+    )
     parser.add_argument("-q", "--quiet", action="store_true", help="output minimale")
     return parser
 
@@ -716,7 +836,7 @@ def main(argv: list[str] | None = None) -> int:
     for source in sources:
         sourceHash = hashFile(source)
         target = args.outDir / f"{source.stem}.md"
-        if not args.singleFile and not args.force and not args.check:
+        if not args.singleFile and not args.force and not args.check and not args.stats:
             if readStoredHash(target) == sourceHash:
                 log(f"= {target} (invariato)")
                 continue
@@ -725,9 +845,25 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as exc:
             print(f"errore: {exc}", file=sys.stderr)
             return 2
+
+        if not elements:
+            print(
+                f"attenzione: nessun elemento trovato in {source} — "
+                "formato non riconosciuto?",
+                file=sys.stderr,
+            )
+
         index = ModelIndex(elements)
         markdown = renderModelMarkdown(index, source, sourceHash)
         documents.append((source, markdown))
+
+        if args.stats:
+            print(f"--- {source} ---")
+            print(f"  elementi totali    : {len(elements)}")
+            print(f"  di presentazione   : {len(index.presentations)}")
+            print(f"  semantici          : {len(index.semantic)}")
+            print(f"  diagrammi          : {len(index.diagrams)}")
+            print(f"  end di associazione: {len(index.associationEnds)}")
 
         if args.check:
             if not target.exists() or readStoredHash(target) != sourceHash:
