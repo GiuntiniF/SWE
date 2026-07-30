@@ -1,0 +1,60 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-08} \\ \hline
+  \ucname{Visualizzazione Atleti} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Il PT visualizza l'elenco dei propri
+    atleti e ne consulta i dettagli.} \\ \hline
+  \ucprecond{Il PT deve essere autenticato.} \\ \hline
+  \ucpostcond{Il PT visualizza i dettagli dell'atleta
+    selezionato.} \\ \hline
+  \ucmainflow{
+    \item Il PT atterra sulla pagina dell'elenco dei propri atleti.
+    \item Il sistema mostra l'elenco degli atleti seguiti dal PT, in
+      ordine alfabetico per cognome, riportando per ciascuno nome,
+      cognome ed email.
+    \item Il PT preme su un atleta dell'elenco.
+    \item Il sistema mostra la pagina di dettaglio dell'atleta, che
+      riporta:
+      \begin{itemize}
+        \item i dati anagrafici (nome, cognome, età, email);
+        \item i dati fisici (altezza e peso);
+        \item le palestre in cui l'atleta si allena;
+        \item l'elenco delle schede assegnate, con nome, periodo di
+          validità e stato;
+        \item l'elenco delle sessioni di allenamento e delle richieste
+          di sessione che riguardano l'atleta, con data, ora e stato.
+      \end{itemize}
+    \item Il PT può premere il tasto "Assegna nuova Scheda" per
+      assegnare una nuova scheda all'atleta.
+    \item Il flusso continua dal passo 2 del caso d'uso PT-05.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{2a. Nessun atleta presente} \newline
+    - Il sistema mostra un messaggio ("Nessun atleta registrato"). \newline
+    - Il flusso termina.
+  } \\ \hline
+  \ucnote{
+    \textbf{Nota 1:} tutte le informazioni della pagina di dettaglio
+    sono in sola lettura. Lo statement attribuisce al PT la sola
+    visualizzazione dei dettagli dei propri atleti, mentre
+    l'inserimento e la modifica dei dati anagrafici spettano
+    all'Atleta (caso d'uso A-05).\newline
+    \textbf{Nota 2:} gli elenchi di schede, sessioni e richieste
+    possono essere vuoti; in tal caso il sistema mostra la
+    corrispondente sezione vuota, senza che il flusso cambi.\newline
+    \textbf{Nota 3:} l'elenco delle schede assegnate è mostrato nel
+    dettaglio anche perché consente al PT di verificare, prima di
+    assegnarne una nuova tramite PT-05, che gli intervalli temporali
+    delle schede dell'atleta non si sovrappongano.\newline
+    \textbf{Nota 4:} il PT vede esclusivamente i propri atleti;
+    l'elenco corrisponde agli atleti associati al PT autenticato.
+  } \\ \hline
+\end{tabularx}
+\end{document}
