@@ -1,0 +1,59 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{U-01} \\ \hline
+  \ucname{Login} \\ \hline
+  \ucactor{Utente (PT o Atleta)} \\ \hline
+  \ucdescription{L'utente accede al sistema inserendo la
+    propria email e il codice di accesso temporaneo che il
+    sistema gli invia per posta elettronica.} \\ \hline
+  \ucprecond{L'utente deve essere registrato nel sistema.} \\ \hline
+  \ucpostcond{L'utente è autenticato e può utilizzare le
+    funzioni previste per il proprio ruolo.} \\ \hline
+  \ucmainflow{
+    \item L'utente atterra sulla pagina di login.
+    \item Il sistema mostra il form di inserimento email.
+    \item L'utente inserisce la email.
+    \item L'utente preme il pulsante "Continua".
+    \item Il sistema verifica la mail nel database.
+    \item Il sistema genera un codice di accesso temporaneo e lo
+      invia per mail all'utente.
+    \item Il sistema mostra il form di inserimento del codice di accesso.
+    \item L'utente inserisce il codice di accesso.
+    \item L'utente preme il pulsante "Accedi".
+    \item Il sistema verifica il codice di accesso e lo invalida.
+    \item Il sistema autentica l'utente e lo indirizza alla propria area.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{5a. Email non registrata:} \newline
+    - Il sistema mostra un messaggio di errore ("Email non valida"). \newline
+    - Il flusso riprende dal punto 2. \newline
+    \textbf{10a. Codice di accesso errato:} \newline
+    - Il sistema mostra un messaggio di errore ("Codice di accesso non
+    valido"). \newline
+    - Il flusso riprende dal punto 8. \newline
+    \textbf{10b. Codice di accesso scaduto:} \newline
+    - Il sistema mostra un messaggio di errore ("Codice di accesso
+    scaduto"). \newline
+    - Il flusso riprende dal punto 2, in quanto si deve richiedere
+    l'invio di un nuovo codice. \newline
+    \textbf{11a. Profilo dell'atleta incompleto:} \newline
+    - Se l'utente autenticato è un Atleta che non ha ancora inserito i
+    propri dati anagrafici e fisici, il sistema lo indirizza al caso
+    d'uso A-01 (Completamento Profilo) prima di dargli accesso alle
+    altre funzioni.
+  } \\ \hline
+  \ucnote{
+    Il sistema non memorizza alcuna password: l'autenticazione è la
+    stessa per entrambi gli attori e si basa esclusivamente sul codice
+    di accesso temporaneo. Il codice è monouso e ha una validità
+    limitata nel tempo; il sistema lo invalida sia al primo utilizzo
+    sia alla scadenza.
+  } \\ \hline
+\end{tabularx}
+\end{document}

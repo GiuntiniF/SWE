@@ -7,54 +7,45 @@
 \begin{tabularx}{\textwidth}{|l|X|}
   \hline
   \ucid{A-01} \\ \hline
-  \ucname{Registrazione Atleta} \\ \hline
+  \ucname{Completamento Profilo} \\ \hline
   \ucactor{Atleta} \\ \hline
-  \ucdescription{L'atleta inserisce le proprie credenziali
-    di accesso per accedere al sistema.} \\ \hline
-  \ucprecond{Il PT deve aver aggiunto l'atleta
-    nell'applicativo, e l'atleta deve aver ricevuto la mail
-    con le istruzioni sul primo accesso e la password temporanea
-    monouso.} \\ \hline
-  \ucpostcond{L'atleta ha impostato la sua password
-    e ha completato la registrazione.} \\ \hline
+  \ucdescription{Al primo accesso l'atleta inserisce i dati
+    anagrafici e fisici che il PT non ha fornito al momento della
+    creazione dell'account.} \\ \hline
+  \ucprecond{L'atleta è autenticato (U-01) e il suo profilo è
+    incompleto: il PT ne ha creato l'account (PT-02) fornendo
+    soltanto nome, cognome ed email.} \\ \hline
+  \ucpostcond{Il profilo dell'atleta è completo e l'atleta può
+    utilizzare tutte le funzioni dell'applicativo.} \\ \hline
   \ucmainflow{
-    \item L'atleta apre il link presente nella mail.
-    \item Il sistema mostra il form di inserimento mail.
-    \item L'atleta inserisce la email.
-    \item L'atleta preme il pulsante "Continua".
-    \item Il sistema verifica la mail nel database.
-    \item Il sistema mostra il form di inserimento della password temporanea.
-    \item L'atleta inserisce la password temporanea che ha ricevuto
-      nella mail.
-    \item L'atleta preme il pulsante "Accedi".
-    \item Il sistema verifica la password temporanea nel database.
-    \item Il sistema mostra il form di inserimento nuova password.
-    \item L'atleta inserisce la nuova password.
-    \item L'atleta preme il tasto "Modifica Password".
-    \item Il sistema salva la password criptata nel database.
-    \item Il sistema mostra il form con i dati da inserire rimanenti
-      (data di nascita, altezza, peso).
-    \item L'atleta inserisce i dati rimanenti.
+    \item Il sistema rileva che il profilo dell'atleta è incompleto.
+    \item Il sistema mostra il form con i dati mancanti (data di
+      nascita, altezza, peso).
+    \item L'atleta inserisce i dati.
     \item L'atleta preme il bottone "Completa Registrazione".
+    \item Il sistema valida i dati inseriti.
     \item Il sistema salva i dati nel database.
+    \item Il sistema indirizza l'atleta alla propria area personale.
   } \\ \hline
   \ucaltflow{
-    \textbf{5a. Email errata:} \newline
-    - Il sistema mostra un messaggio di errore ("Email non valida"). \newline
-    - Il flusso riprende dal punto 2. \newline
-    \textbf{9a. Codice di conferma errato:} \newline
-    - Il sistema mostra un messaggio di errore ("Codice di conferma non
-    valido"). \newline
-    - Il flusso riprende dal punto 8. \newline
-    \textbf{9b. Codice di conferma scaduto:} \newline
-    - Il sistema mostra un messaggio di errore ("Codice di conferma
-    scaduto"). \newline
-    - Il flusso riprende dal punto 2 in quanto si deve richiedere
-    l'invio di un nuovo codice.\newline
-    \textbf{12a. Password troppo debole} \newline
-    - Il sistema mostra un messaggio di errore ("La password inserita
-    deve contenere almeno...")
-    - Il flusso riprende dal punto 10.
+    \textbf{2a. L'atleta abbandona prima di completare:} \newline
+    - Il profilo resta incompleto e nessun dato viene salvato. \newline
+    - Al successivo accesso il sistema ripropone il flusso dal
+    punto 1. \newline
+    \textbf{5a. Dati non validi:} \newline
+    - Il sistema mostra un messaggio di errore ("Controllare i dati
+    inseriti"), indicando i campi non validi (data di nascita futura,
+    altezza o peso non positivi). \newline
+    - Il flusso riprende dal punto 2.
+  } \\ \hline
+  \ucnote{
+    Finché il profilo è incompleto l'atleta non può accedere alle
+    altre funzioni dell'applicativo. I dati richiesti non sono
+    facoltativi: la data di nascita alimenta l'operazione
+    \texttt{getAge()} di \texttt{Athlete}, mentre altezza e peso
+    servono al PT per la prescrizione dei carichi. L'atleta potrà
+    modificarli in seguito tramite il caso d'uso A-05 (Modifica Dati
+    Anagrafici).
   } \\ \hline
 \end{tabularx}
 \end{document}

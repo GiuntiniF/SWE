@@ -10,38 +10,39 @@
   \ucname{Registrazione nuovo Atleta} \\ \hline
   \ucactor{PT} \\ \hline
   \ucsecondaryactor{Atleta da Registrare} \\ \hline
-  \ucdescription{Il PT crea un account all'atleta da
-    registrare, e l'Atleta completa la registrazione.} \\ \hline
+  \ucdescription{Il PT crea l'account di un nuovo atleta e il
+    sistema invita l'atleta ad accedere all'applicativo.} \\ \hline
   \ucprecond{Il PT deve essere loggato e deve
     avere la mail dell'atleta da registrare.} \\ \hline
-  \ucpostcond{L'atleta è registrato nell'applicativo.} \\ \hline
+  \ucpostcond{L'atleta ha un account nell'applicativo ed è stato
+    invitato ad accedervi. Il suo profilo resta incompleto finché
+    l'atleta non esegue il caso d'uso A-01.} \\ \hline
   \ucmainflow{
-    \item Il PT atterra sulla pagina di crezione nuovo atleta.
+    \item Il PT atterra sulla pagina di creazione nuovo atleta.
     \item Il sistema mostra il form di inserimento dati dell'atleta
       (nome, cognome e mail).
     \item Il PT inserisce i dati.
     \item Il PT preme il pulsante "Crea atleta".
-    \item Il sistema verifica che la mail non sia già presente nel database.
+    \item Il sistema verifica che la mail sia valida e non sia già
+      presente nel database.
+    \item Il sistema crea l'account dell'atleta e lo associa al PT.
     \item Il sistema mostra una pagina di conferma creazione.
-    \item Il sistema invia una mail all'atleta con le istruzioni al
-      primo login e una password temporanea e monouso.
+    \item Il sistema invia una mail all'atleta con l'invito ad
+      accedere all'applicativo e le istruzioni per il primo accesso.
   } \\ \hline
   \ucaltflow{
     \textbf{5a. Email già presente} \newline
     - Il sistema mostra un messaggio di errore ("Atleta con questa
     email già presente"). \newline
     - Il flusso riprende dal punto 2. \newline
-    \textbf{12a. Email errata} \newline
+    \textbf{5b. Email non valida} \newline
     - Il sistema mostra un messaggio di errore ("Email non valida"). \newline
-    - Il flusso riprende dal punto 9. \newline
-    \textbf{16a. Password temporanea errata} \newline
-    - Il sistema mostra un messaggio di errore ("Password errata"). \newline
-    - Il flusso riprende dal punto 13. \newline
-    \textbf{16b. Password temporanea scaduta} \newline
-    - Il sistema mostra un messaggio di errore ("Password temporanea
-    scaduta, contattare il proprio PT"). \newline
-    - Il flusso si interrompe finché non viene inviata una nuova
-    password temporanea all'atleta.
+    - Il flusso riprende dal punto 2.
+  } \\ \hline
+  \ucnote{
+    L'invito non contiene credenziali: l'atleta accede tramite il
+    caso d'uso U-01 (Login), che gli invia un codice di accesso
+    temporaneo, e completa poi il proprio profilo con A-01.
   } \\ \hline
 \end{tabularx}
 \end{document}
