@@ -1,16 +1,51 @@
 {
   "permissions": {
     "allow": [
-      "Bash(rm -f SoftwareRequirementsSpecification.synctex.gz \"SoftwareRequirementsSpecification.synctex\\(busy\\)\")",
       "Bash(latexmk -pdf -interaction=nonstopmode -halt-on-error SoftwareRequirementsSpecification.tex)",
-      "Bash(find / -maxdepth 6 -iname \"*triage*\" -path \"*skills*\")",
-      "Read(//home/francesco/.claude/**)",
+      "Bash(latexmk -pdf -interaction=nonstopmode SoftwareRequirementsSpecification.tex)",
+      "Bash(rm -f SoftwareRequirementsSpecification.synctex.gz \"SoftwareRequirementsSpecification.synctex\\(busy\\)\")",
+
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git fetch *)",
+      "Bash(git ls-remote *)",
+      "Bash(git push origin *)",
       "Bash(git check-ignore *)",
-      "Skill(update-config)",
-      "Bash(gh *)"
+      "Bash(git -C /home/francesco/Work/Universita/SWEClaude worktree list)",
+
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
+      "Bash(gh run list *)",
+      "Bash(gh run view *)",
+
+      "Bash(curl -s https://raw.githubusercontent.com/mattpocock/sandcastle/*)",
+
+      "Bash(ps -p * -o pid,etime,cmd)",
+      "Bash(grep -n * dist/index.js)",
+      "Bash(find / -maxdepth 6 -iname \"*triage*\" -path \"*skills*\")",
+
+      "Read(/home/francesco/.claude/settings.json)",
+      "Read(/home/francesco/.claude/skills/**)",
+      "Read(/home/francesco/.claude/agents/**)",
+      "Read(/home/francesco/.claude/commands/**)",
+
+      "WebSearch"
     ],
     "deny": [
-      "Read(./docs/modello/*.gaphor)",
+      "Read(/home/francesco/.claude/.credentials.json)",
+      "Read(/home/francesco/.claude/**/*.credentials*)",
+      "Read(/home/francesco/.ssh/**)",
+      "Read(/home/francesco/.config/gh/**)",
+      "Read(/home/francesco/.aws/**)",
+      "Read(./**/.env*)",
+      "Read(./**/*secret*)",
+
+      "Bash(xdg-open *)",
+      "Bash(gh auth token *)",
+      "Bash(gh secret *)",
+      "Bash(gh repo delete *)",
+
+      "Read(./**/*.gaphor)",
       "Read(./**/*.svg)",
       "Read(./**/*.pdf)",
       "Read(./**/*.png)",
