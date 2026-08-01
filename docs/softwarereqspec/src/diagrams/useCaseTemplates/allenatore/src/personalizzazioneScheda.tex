@@ -1,0 +1,131 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-09} \\ \hline
+  \ucname{Personalizzazione di una Scheda Assegnata} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Il PT interviene sugli allenamenti di
+    una scheda che un atleta sta già seguendo, modificandoli solo
+    per quell'atleta.} \\ \hline
+  \ucprecond{Il PT deve essere autenticato e
+    l'atleta scelto deve avere almeno una scheda assegnata in
+    corso.} \\ \hline
+  \ucpostcond{Gli allenamenti prescritti a
+    quell'atleta per la settimana scelta risultano modificati, senza
+    che cambino né la scheda né gli allenamenti degli altri
+    atleti che la seguono.} \\ \hline
+  \ucmainflow{
+    \item Il PT si trova sulla pagina di dettaglio di un atleta,
+      raggiunta tramite il caso d'uso PT-08.
+    \item Il PT preme su una scheda dell'elenco delle schede
+      assegnate.
+    \item Il sistema mostra il dettaglio dell'assegnazione, che
+      riporta il nome della scheda, il periodo di validità e
+      l'elenco delle settimane di allenamento, con evidenziata la
+      settimana corrente e segnalate le settimane che contengono
+      personalizzazioni.
+    \item Il PT preme su una settimana, scelta fra quella corrente e
+      le successive (vedi Nota 2).
+    \item Il sistema mostra le sessioni di allenamento della
+      settimana con i valori previsti per quell'atleta (vedi
+      Nota 1).
+    \item Il PT preme su un esercizio.
+    \item Il sistema mostra il form con i valori correnti
+      dell'esercizio:
+      \begin{itemize}
+        \item peso;
+        \item numero di serie/ripetizioni;
+        \item tempo di recupero tra una serie e l'altra (in
+          secondi).
+      \end{itemize}
+    \item Il PT modifica i valori che vuole ritoccare e indica se
+      estendere la modifica anche alle settimane successive del
+      blocco mensile (vedi Nota 5).
+    \item Il PT preme il tasto "Salva".
+    \item Il sistema registra la personalizzazione per la settimana
+      scelta e, se il PT ne ha chiesto l'estensione, la registra
+      anche per ciascuna settimana rimanente del blocco, ricalcolando
+      i valori con la progressione dell'esercizio a partire dal nuovo
+      valore inserito.
+    \item Il sistema invia una mail di notifica all'Atleta per
+      informarlo che la sua scheda è cambiata.
+  } \\ \hline
+  \ucaltflow{
+    \textbf{2a. Nessuna scheda assegnata} \newline
+    - L'atleta non ha schede assegnate: il sistema mostra la
+    sezione vuota. \newline
+    - Il flusso termina. \newline
+    \textbf{4a. Scheda terminata} \newline
+    - Tutte le settimane della scheda sono trascorse e nessuna è
+    quindi modificabile. \newline
+    - Il sistema mostra un messaggio ("Scheda terminata: non ci sono
+    settimane modificabili"). \newline
+    - Il flusso termina. \newline
+    \textbf{7a. Ripristino del valore originale} \newline
+    - Se l'esercizio è stato personalizzato, il sistema mostra
+    accanto ai valori il tasto "Ripristina". \newline
+    - Il PT lo preme e il sistema riporta l'esercizio ai valori
+    previsti dalla scheda. \newline
+    - Se lo stesso esercizio è personalizzato anche nelle settimane
+    successive del blocco, il sistema chiede se ripristinare anche
+    quelle. \newline
+    - Il flusso riprende dal punto 5. \newline
+    \textbf{8a. Salto di un esercizio} \newline
+    - Invece di ritoccare i valori il PT preme il tasto "Salta
+    esercizio", così che l'atleta non lo svolga in quella
+    settimana. \newline
+    - Il flusso riprende dal punto 10. \newline
+    \textbf{8b. Sostituzione di un esercizio} \newline
+    - Invece di ritoccare i valori il PT preme il tasto
+    "Sostituisci". \newline
+    - Il sistema mostra la lista degli esercizi, come al passo 6 del
+    caso d'uso PT-04. \newline
+    - Il PT sceglie l'esercizio sostitutivo e ne configura i valori.
+    \newline
+    - Il flusso riprende dal punto 10.
+  } \\ \hline
+  \ucnote{
+    \textbf{Nota 1:} i valori mostrati al passo 5 non sono
+    memorizzati: il sistema li calcola a partire dagli allenamenti
+    configurati nel blocco mensile (PT-04), dalla progressione di
+    ciascun esercizio, dai pesi inseriti per l'atleta al momento
+    dell'assegnazione (PT-05) e dalle personalizzazioni già
+    presenti. La modifica è registrata come scostamento sulla
+    singola assegnazione: la scheda resta invariata e gli altri
+    atleti che la seguono non sono toccati.\newline
+    \textbf{Nota 2:} sono modificabili solo la settimana corrente e
+    le successive. Le settimane già trascorse sono in sola lettura,
+    perché l'atleta si è già allenato su quanto vi era
+    prescritto.\newline
+    \textbf{Nota 3:} lo statement prescrive che la tipologia di
+    esercizi in una scheda vari solo da mese a mese. Il vincolo è
+    rispettato sulla scheda, dove la tipologia è fissata per
+    l'intero blocco mensile dagli allenamenti configurati in PT-04.
+    Il salto e la sostituzione di un esercizio (flussi 8a e 8b) non
+    modificano la scheda: sono eccezioni riferite a un singolo atleta
+    e a una singola settimana, che rispondono a situazioni
+    contingenti quali un infortunio o l'indisponibilità di un
+    macchinario.\newline
+    \textbf{Nota 4:} la personalizzazione non consente di aggiungere
+    esercizi non previsti, di cambiare il numero o la composizione
+    delle sessioni della settimana, di cambiare la durata della
+    scheda, né di cambiare la progressione assegnata a un
+    esercizio, che è parte della scheda e vale per tutti gli atleti
+    che la seguono. Per interventi di questa natura il PT deve
+    duplicare la scheda e assegnare la copia.\newline
+    \textbf{Nota 5:} l'estensione del passo 8 si ferma alla fine del
+    blocco mensile corrente, perché i blocchi sono indipendenti e
+    la progressione riparte a ogni blocco. Se l'esercizio non ha una
+    progressione, il valore inserito è ripetuto identico sulle
+    settimane rimanenti.\newline
+    \textbf{Nota 6:} la personalizzazione riguarda ciò che è
+    prescritto all'atleta e non altera in alcun modo gli allenamenti
+    che l'atleta ha già svolto e registrato.
+  } \\ \hline
+\end{tabularx}
+\end{document}
