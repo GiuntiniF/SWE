@@ -1,0 +1,57 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{PT-01} \\ \hline
+  \ucname{Registrazione PT} \\ \hline
+  \ucactor{PT} \\ \hline
+  \ucdescription{Un personal trainer crea autonomamente il proprio
+    account per poter utilizzare l'applicativo.} \\ \hline
+  \ucprecond{L'utente non ha un account nel sistema.} \\ \hline
+  \ucpostcond{Il PT ha un account nell'applicativo e può accedervi
+    tramite il caso d'uso U-01. Non ha ancora alcun atleta
+    associato.} \\ \hline
+  \ucmainflow{
+    \item L'utente atterra sulla pagina di registrazione.
+    \item Il sistema mostra il form di inserimento dati (nome,
+      cognome e mail).
+    \item L'utente inserisce i dati.
+    \item L'utente preme il pulsante "Registrati".
+    \item Il sistema verifica che i dati siano validi e che la mail
+      non sia già presente nel database.
+    \item Il sistema crea l'account del PT.
+    \item Il sistema mostra una pagina di conferma e indirizza
+      l'utente al caso d'uso U-01 (Login).
+  } \\ \hline
+  \ucaltflow{
+    \textbf{5a. Email già registrata:} \newline
+    - Il sistema mostra un messaggio di errore ("Email già
+    registrata"). \newline
+    - Il flusso riprende dal punto 2. \newline
+    \textbf{5b. Dati non validi:} \newline
+    - Il sistema mostra un messaggio di errore ("Controllare i dati
+    inseriti"), indicando i campi non validi (email in formato non
+    valido, nome o cognome vuoti). \newline
+    - Il flusso riprende dal punto 2.
+  } \\ \hline
+  \ucnote{
+    La registrazione non stabilisce alcuna credenziale: il sistema è
+    passwordless e l'unico meccanismo di accesso è il codice
+    temporaneo di U-01. Per questo motivo il caso d'uso non prevede
+    un passo di verifica dell'indirizzo di posta elettronica: il
+    possesso della mail è dimostrato al primo accesso, dato che senza
+    ricevere il codice temporaneo l'account resta inutilizzabile. Per
+    lo stesso motivo il sistema non autentica l'utente al termine
+    della registrazione, ma lo indirizza al login. \newline
+    Il messaggio del flusso 5a non distingue fra una mail già usata
+    da un altro PT e una mail di un atleta già registrato dal proprio
+    PT: l'unicità di \texttt{email} su \texttt{User} vale sull'intera
+    gerarchia, quindi uno stesso utente non può ricoprire entrambi i
+    ruoli.
+  } \\ \hline
+\end{tabularx}
+\end{document}
