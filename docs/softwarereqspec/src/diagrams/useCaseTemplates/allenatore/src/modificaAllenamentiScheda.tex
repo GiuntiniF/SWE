@@ -7,15 +7,16 @@
 \begin{tabularx}{\textwidth}{|l|X|}
   \hline
   \ucid{PT-04} \\ \hline
-  \ucname{Configurazione Sessioni di Allenamento in Template
-    di Scheda} \\ \hline
+  \ucname{Configurazione Sessioni di Allenamento in una
+    Scheda} \\ \hline
   \ucactor{PT} \\ \hline
   \ucdescription{Il PT inserisce o modifica gli
     allenamenti presenti in una scheda.} \\ \hline
   \ucprecond{Il PT deve essere loggato e deve
-    essere presente almeno un template di scheda da modificare.} \\ \hline
-  \ucpostcond{Vengono configurati gli allenamenti in
-    un template di una scheda.} \\ \hline
+    essere presente almeno una scheda da modificare, che non abbia
+    assegnazioni attive.} \\ \hline
+  \ucpostcond{Vengono configurati gli allenamenti di
+    una scheda.} \\ \hline
   \ucmainflow{
     \item Il PT atterra sulla pagina di configurazione delle
       sessioni di allenamento.
@@ -48,7 +49,15 @@
     \textbf{5b. Modifica sessione scelta} \newline
     - Il PT decide di modificare un'altra sessione di
     allenamento invece di quella corrente.\newline
-    - Il flusso riprende dal punto 1.
+    - Il flusso riprende dal punto 1.\newline
+    \textbf{9c. Progressione non compatibile con l'esercizio} \newline
+    - Non tutte le progressioni sono applicabili a tutti gli esercizi
+    (una progressione di carico non ha senso su un esercizio a corpo
+    libero, una di volume su un esercizio a cedimento). \newline
+    - Il sistema propone quindi solo le progressioni compatibili con
+    l'esercizio scelto al passo 7; se nessuna lo è, il campo non
+    viene proposto. \newline
+    - Il flusso riprende dal punto 9.
   } \\ \hline
   \ucvariations{
     \textbf{9a. Selezione variante di esecuzione} \newline
@@ -56,11 +65,11 @@
     aggiuntivi (es. altri esercizi da effettuare in superserie, tempo di recupero
     tra una miniserie e l'altra nel rest-pause etc..).\newline
     \textbf{9b. Selezione tipo di progressione}\newline
-    - Se viene selezionata una variante potrebbero essere richiesti
+    - Se viene selezionata una progressione potrebbero essere richiesti
     dati aggiuntivi (es. modifica settimanale del peso nella
       progressione di carico, delle serie/ripetizioni nella
       progressione di volume, di entrambi nella doppia progressione, o
-    del tempo di esecuzione in quella di densità.)
+    del tempo di recupero in quella di densità.)
   } \\ \hline
 \end{tabularx}
 \end{document}

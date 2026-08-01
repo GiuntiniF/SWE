@@ -9,23 +9,26 @@
   \ucid{PT-05} \\ \hline
   \ucname{Assegnazione Scheda ad un Atleta} \\ \hline
   \ucactor{PT} \\ \hline
-  \ucdescription{Il PT assegna una scheda ad un
-    atleta partendo da un template.} \\ \hline
-  \ucprecond{Il PT deve essere loggato e devono
-    essere presenti almeno un template configurato ed un atleta.} \\ \hline
-  \ucpostcond{Viene creata una nuova scheda basata sul
-    template scelto per l'atleta.} \\ \hline
+  \ucdescription{Il PT assegna ad un atleta una scheda
+    già presente nel sistema.} \\ \hline
+  \ucprecond{Il PT deve essere loggato e deve
+    essere presente almeno una scheda configurata.} \\ \hline
+  \ucpostcond{La scheda scelta risulta assegnata
+    all'atleta, con i carichi della prima settimana specifici per
+    lui.} \\ \hline
   \ucmainflow{
-    \item Il PT atterra sulla pagina del dettaglio Atleta.
+    \item Il PT si trova sulla pagina di dettaglio di un atleta,
+      raggiunta tramite il caso d'uso PT-08.
     \item Il PT preme il tasto "Assegna nuova Scheda".
-    \item Il sistema mostra la lista dei template presenti nel sistema.
-    \item Il PT preme sul template che vuole usare.
+    \item Il sistema mostra la lista delle schede presenti nel sistema.
+    \item Il PT preme sulla scheda che vuole usare.
     \item Il sistema mostra il form di inserimento dei dati
       aggiuntivi necessari, in particolare la data di inizio della
-      scheda e il numero di mesi che questa ricopre.
+      scheda, e la durata della scheda, derivata dal numero di
+      blocchi mensili configurati in PT-04.
     \item Il PT inserisce i dati e preme il tasto "Continua".
-    \item Il sistema mostra il form per inserire il peso dei vari
-      (vedi le Note).
+    \item Il sistema mostra il form per inserire i pesi degli
+      esercizi delle sessioni della prima settimana (vedi le Note).
     \item Il PT inserisce i dati nel form e preme il tasto
       "Assegna Scheda".
     \item Il sistema assegna la Scheda all'Atleta.
@@ -34,11 +37,11 @@
   } \\ \hline
   \ucaltflow{
     \textbf{4a. Creazione scheda ad hoc} \newline
-    - L'allenatore può anche creare una scheda da zero per il Cliente,
-    creando un template temporaneo. \newline
-    - Il flusso continua dal passo 1 del caso d'uso A-03,
-    successivamente dal passo 1 del caso d'uso A-04. \newline
-    - Dopo la creazione del template temporaneo il flusso riprende dal
+    - Invece di scegliere una scheda già presente, il PT può crearne
+    una da zero per l'atleta. \newline
+    - Il flusso continua dal passo 1 del caso d'uso PT-03,
+    successivamente dal passo 1 del caso d'uso PT-04. \newline
+    - Dopo la creazione della scheda il flusso riprende dal
     passo 5. \newline
   } \\ \hline
   \ucnote{
@@ -46,8 +49,7 @@
     sessioni della prima settimana di allenamento, i pesi delle
     settimane successive saranno calcolati automaticamente dalle
     percentuali delle progressioni se queste sono presenti, altrimenti
-    verrà usato lo stesso peso per tutte le settimanper tutte le
-    settimane.\newline
+    verrà usato lo stesso peso per tutte le settimane.\newline
     \textbf{Nota 2:} Nel caso di esercizi con variazione drop-set,
     andranno specificati 2 pesi diversi.
   } \\ \hline
