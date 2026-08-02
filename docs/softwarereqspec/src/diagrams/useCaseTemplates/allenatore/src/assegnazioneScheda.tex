@@ -25,7 +25,9 @@
     \item Il sistema mostra il form di inserimento dei dati
       aggiuntivi necessari, in particolare la data di inizio della
       scheda, e la durata della scheda, derivata dal numero di
-      blocchi mensili configurati in PT-04.
+      blocchi mensili configurati in PT-04; una volta inserita la
+      data di inizio, il sistema mostra anche la data di fine che ne
+      deriva (vedi le Note).
     \item Il PT inserisce i dati e preme il tasto "Continua".
     \item Il sistema mostra il form per inserire i pesi degli
       esercizi delle sessioni della prima settimana (vedi le Note).
@@ -43,6 +45,14 @@
     successivamente dal passo 1 del caso d'uso PT-04. \newline
     - Dopo la creazione della scheda il flusso riprende dal
     passo 5. \newline
+    \newline
+    \textbf{6a. Sovrapposizione con una scheda già assegnata} \newline
+    - Il sistema rileva che l'intervallo di date della nuova
+    assegnazione si sovrappone a quello di una scheda già assegnata
+    all'atleta. \newline
+    - Il sistema mostra un messaggio di errore riportando il nome e
+    l'intervallo di date della scheda in conflitto. \newline
+    - Il flusso riprende dal passo 5. \newline
   } \\ \hline
   \ucnote{
     \textbf{Nota 1:} sarà necessario inserire i pesi degli esercizi solo per le
@@ -51,7 +61,14 @@
     percentuali delle progressioni se queste sono presenti, altrimenti
     verrà usato lo stesso peso per tutte le settimane.\newline
     \textbf{Nota 2:} Nel caso di esercizi con variazione drop-set,
-    andranno specificati 2 pesi diversi.
+    andranno specificati 2 pesi diversi.\newline
+    \textbf{Nota 3:} l'intervallo di date occupato da
+    un'assegnazione va dalla data di inizio all'ultimo giorno
+    dell'ultimo blocco mensile: ciascun blocco dura 4 settimane
+    (28 giorni), quindi la data di fine è determinata dalla data di
+    inizio e dal numero di blocchi, e non viene chiesta al PT. Due
+    assegnazioni contigue, in cui una termina il giorno prima che
+    l'altra inizi, non si sovrappongono e sono quindi ammesse.
   } \\ \hline
 \end{tabularx}
 \end{document}
