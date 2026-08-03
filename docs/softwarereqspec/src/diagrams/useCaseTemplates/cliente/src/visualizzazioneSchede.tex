@@ -8,26 +8,65 @@
   \hline
   \ucid{A-04} \\ \hline
   \ucname{Visualizzazione Schede Assegnate} \\ \hline
-  \ucactor{Atleta registrato} \\ \hline
-  \ucdescription{L'atleta visualizza l'elenco delle schede di
-    allenamento che gli sono state assegnate dal proprio PT.} \\ \hline
-  \ucprecond{L'atleta deve essere autenticato e deve
-    avere almeno una scheda assegnata.} \\ \hline
-  \ucpostcond{L'atleta visualizza l'elenco delle schede
-    assegnate e i relativi dettagli.} \\ \hline
+  \ucactor{Atleta} \\ \hline
+  \ucdescription{L'atleta consulta le schede di
+    allenamento che gli sono state assegnate dal proprio PT, fino al
+    dettaglio degli esercizi previsti in ciascuna settimana, e li
+    confronta con quanto ha registrato di avere svolto.} \\ \hline
+  \ucprecond{L'atleta deve essere autenticato.} \\ \hline
+  \ucpostcond{L'atleta visualizza gli allenamenti
+    previsti per la settimana scelta e, dove presenti, gli
+    allenamenti che vi ha registrato.} \\ \hline
   \ucmainflow{
-    \item L'atleta atterra sulla pagina delle schede.
+    \item L'atleta atterra sulla pagina delle proprie schede.
     \item Il sistema mostra l'elenco delle schede di allenamento
-      assegnate, con nome, date e stato.
-    \item L'atleta seleziona una scheda per visualizzarne i dettagli.
-    \item Il sistema mostra il dettaglio della scheda, con i mesi,
-      le sessioni di allenamento e gli esercizi previsti.
+      assegnate all'atleta, con nome, periodo di validità e stato.
+    \item L'atleta preme su una scheda dell'elenco.
+    \item Il sistema mostra il dettaglio della scheda assegnata, che
+      riporta il nome, il periodo di validità e l'elenco delle
+      settimane di allenamento, con evidenziata la settimana corrente
+      e segnalate le settimane in cui l'atleta ha registrato almeno
+      un allenamento.
+    \item L'atleta preme su una settimana, scelta fra tutte quelle
+      della scheda, comprese quelle già trascorse (vedi Nota 4).
+    \item Il sistema mostra le sessioni di allenamento della
+      settimana con gli esercizi previsti e i valori prescritti a
+      quell'atleta (vedi Nota 1); per le sessioni in cui l'atleta ha
+      registrato un allenamento, accanto ai valori prescritti sono
+      riportati quelli che ha effettivamente svolto e gli esercizi
+      che ha marcato come saltati (vedi Nota 3).
   } \\ \hline
   \ucaltflow{
     \textbf{2a. Nessuna scheda assegnata} \newline
     - Il sistema mostra un messaggio ("Nessuna scheda di allenamento
     assegnata"). \newline
-    - Il flusso termina.
+    - Il flusso termina. \newline
+    \textbf{6a. Modifica di un allenamento registrato} \newline
+    - L'atleta preme su una sessione per cui ha registrato un
+    allenamento. \newline
+    - Il flusso continua dal flusso alternativo 5a del caso d'uso
+    A-02 (vedi Nota 2).
+  } \\ \hline
+  \ucnote{
+    \textbf{Nota 1:} i valori mostrati al passo 6 non sono
+    memorizzati: il sistema li calcola a partire dagli allenamenti
+    configurati nel blocco mensile (PT-04), dalla progressione di
+    ciascun esercizio, dai pesi inseriti dal PT al momento
+    dell'assegnazione (PT-05) e dalle personalizzazioni
+    eventualmente introdotte dal PT per quell'atleta
+    (PT-09).\newline
+    \textbf{Nota 2:} la registrazione di un nuovo allenamento non
+    parte da questa pagina, ma dal caso d'uso A-02, che la guida a
+    partire dalla data e ne ricava la settimana. Da qui si raggiunge
+    soltanto la modifica di un allenamento già registrato, per il
+    quale data e sessione sono già note.\newline
+    \textbf{Nota 3:} l'assenza di un allenamento registrato significa
+    che l'atleta non lo ha registrato, non che non lo ha svolto: il
+    sistema non può distinguere i due casi.\newline
+    \textbf{Nota 4:} tutto ciò che questo caso d'uso mostra è in sola
+    lettura, comprese le settimane trascorse. A differenza del PT
+    (caso d'uso PT-09), l'atleta non modifica in alcun caso ciò che
+    gli è prescritto.
   } \\ \hline
 \end{tabularx}
 \end{document}
