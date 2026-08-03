@@ -12,6 +12,16 @@
 *.ilg
 *.ind
 
+# PDF compilati dalla SRS: artefatti derivati, prodotti dalla CI e pubblicati
+# su GitHub Pages e nelle release (vedi .github/workflows/srs.yml). Tracciarli
+# significa conflitti di merge insanabili a ogni PR parallela, perche' git non
+# sa fondere due binari, e copie stantie che nessuno si ricorda di rigenerare.
+# Restano invece tracciati lo statement e gli export dei diagrammi, che non
+# sono prodotti da questa compilazione.
+docs/softwarereqspec/SoftwareRequirementsSpecification.pdf
+docs/softwarereqspec/src/SoftwareRequirementsSpecification.pdf
+docs/softwarereqspec/src/diagrams/useCaseTemplates/**/*.pdf
+
 node_modules/
 .env
 
