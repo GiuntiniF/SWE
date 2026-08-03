@@ -1,0 +1,155 @@
+name: SRS
+
+# Compila la Software Requirements Specification e ne pubblica il PDF.
+#
+# Il PDF non è tracciato in git: è un artefatto derivato, e due branch che lo
+# rigenerano producono binari inconciliabili che git non sa fondere. Viene
+# quindi prodotto qui e pubblicato in tre forme, a seconda dell'evento:
+#
+#   - su ogni pull request, come artifact scaricabile dalla pagina della run,
+#     per rivedere l'impaginazione prima del merge;
+#   - a ogni push su master, su GitHub Pages, all'indirizzo fisso del sito;
+#   - a ogni tag "v*", come allegato della release, per congelare le versioni
+#     consegnate.
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: srs-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SRS_DIR: docs/softwarereqspec/src
+  SRS_NAME: SoftwareRequirementsSpecification
+
+jobs:
+  build:
+    name: Compila
+    runs-on: ubuntu-latest
+    # Immagine ufficiale TeX Live, schema completo: il documento usa fra gli
+    # altri tcolorbox, subfiles, flushend, chngpage e babel-italian, che gli
+    # schemi ridotti non contengono tutti.
+    container: texlive/texlive:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compila la SRS
+        working-directory: ${{ env.SRS_DIR }}
+        # Due passate: la prima scrive indice ed etichette nei file ausiliari,
+        # la seconda li rilegge per impaginarli coi numeri di pagina corretti.
+        run: |
+          pdflatex -interaction=nonstopmode -halt-on-error "$SRS_NAME.tex"
+          pdflatex -interaction=nonstopmode -halt-on-error "$SRS_NAME.tex"
+
+      - name: Verifica che il PDF non sia mozzo
+        working-directory: ${{ env.SRS_DIR }}
+        # -halt-on-error copre gli errori veri; questo intercetta il caso in cui
+        # la compilazione riesce ma produce un documento tronco. Il conteggio si
+        # legge dal log di pdflatex, senza dipendere da poppler.
+        run: |
+          pages=$(grep -oE '\([0-9]+ pages' "$SRS_NAME.log" | tail -1 | grep -oE '[0-9]+')
+          echo "Pagine prodotte: ${pages:-0}"
+          test "${pages:-0}" -ge 10
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SRS_NAME }}
+          path: ${{ env.SRS_DIR }}/${{ env.SRS_NAME }}.pdf
+          if-no-files-found: error
+
+  pages:
+    name: Pubblica su GitHub Pages
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.SRS_NAME }}
+          path: site
+
+      - name: Genera l'indice del sito
+        run: |
+          cat > site/index.html <<HTML
+          <!doctype html>
+          <html lang="it">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>SWE — Documentazione</title>
+            <style>
+              :root { color-scheme: light dark; }
+              body {
+                font-family: system-ui, sans-serif;
+                max-width: 40rem;
+                margin: 4rem auto;
+                padding: 0 1.5rem;
+                line-height: 1.6;
+              }
+              a { color: inherit; }
+              .meta { opacity: .7; font-size: .9rem; }
+            </style>
+          </head>
+          <body>
+            <h1>SWE — Documentazione</h1>
+            <p>
+              <a href="$SRS_NAME.pdf">Software Requirements Specification (PDF)</a>
+            </p>
+            <p class="meta">
+              Compilata da <code>${GITHUB_SHA:0:7}</code> il $(date -u '+%d/%m/%Y alle %H:%M UTC').
+              Riflette sempre l'ultimo stato di <code>master</code>; le versioni
+              consegnate sono allegate alle
+              <a href="https://github.com/$GITHUB_REPOSITORY/releases">release</a>.
+            </p>
+          </body>
+          </html>
+          HTML
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+  release:
+    name: Allega alla release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.SRS_NAME }}
+
+      - name: Crea la release e allega il PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$SRS_NAME.pdf" --clobber
+          else
+            gh release create "$TAG" "$SRS_NAME.pdf" \
+              --title "$TAG" --generate-notes
+          fi
