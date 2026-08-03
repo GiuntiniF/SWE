@@ -29,7 +29,11 @@
         \item l'elenco delle schede assegnate, con nome, periodo di
           validità e stato;
         \item l'elenco delle sessioni di allenamento e delle richieste
-          di sessione che riguardano l'atleta, con data, ora e stato.
+          di sessione che riguardano l'atleta, con data, ora e stato;
+        \item l'elenco degli allenamenti che l'atleta ha registrato
+          come svolti, dal più recente, con la data, la scheda, la
+          settimana e la sessione cui si riferiscono e il numero di
+          esercizi risultati saltati (vedi Note 5 e 6).
       \end{itemize}
     \item Il PT può premere il tasto "Assegna nuova Scheda" per
       assegnare una nuova scheda all'atleta.
@@ -43,7 +47,15 @@
     - Invece di assegnare una nuova scheda, il PT preme su una scheda
     dell'elenco delle schede assegnate, per modificarne gli
     allenamenti limitatamente a quell'atleta. \newline
-    - Il flusso continua dal passo 3 del caso d'uso PT-09.
+    - Il flusso continua dal passo 3 del caso d'uso PT-09. \newline
+    \textbf{5b. Consultazione di un allenamento registrato} \newline
+    - Il PT preme su un allenamento dell'elenco degli allenamenti
+    registrati. \newline
+    - Il sistema mostra, per ciascun esercizio di quella sessione, i
+    valori prescritti all'atleta e quelli che l'atleta ha registrato
+    di avere svolto, segnalando gli esercizi marcati come
+    saltati. \newline
+    - Il flusso termina.
   } \\ \hline
   \ucnote{
     \textbf{Nota 1:} tutte le informazioni della pagina di dettaglio
@@ -51,15 +63,26 @@
     visualizzazione dei dettagli dei propri atleti, mentre
     l'inserimento e la modifica dei dati anagrafici spettano
     all'Atleta (caso d'uso A-05).\newline
-    \textbf{Nota 2:} gli elenchi di schede, sessioni e richieste
-    possono essere vuoti; in tal caso il sistema mostra la
-    corrispondente sezione vuota, senza che il flusso cambi.\newline
+    \textbf{Nota 2:} gli elenchi di schede, sessioni, richieste e
+    allenamenti registrati possono essere vuoti; in tal caso il
+    sistema mostra la corrispondente sezione vuota, senza che il
+    flusso cambi.\newline
     \textbf{Nota 3:} l'elenco delle schede assegnate è mostrato nel
     dettaglio anche perché consente al PT di verificare, prima di
     assegnarne una nuova tramite PT-05, che gli intervalli temporali
     delle schede dell'atleta non si sovrappongano.\newline
     \textbf{Nota 4:} il PT vede esclusivamente i propri atleti;
-    l'elenco corrisponde agli atleti associati al PT autenticato.
+    l'elenco corrisponde agli atleti associati al PT autenticato.\newline
+    \textbf{Nota 5:} gli allenamenti registrati sono scritti
+    esclusivamente dall'Atleta (caso d'uso A-02). Il PT non può
+    crearli, modificarli né cancellarli, coerentemente con la Nota 1;
+    il sistema non lo avvisa quando un atleta ne registra uno, ed è
+    il PT a consultarli quando lo ritiene opportuno.\newline
+    \textbf{Nota 6:} l'assenza di un allenamento registrato significa
+    che l'atleta non lo ha registrato, non che non lo ha svolto: il
+    sistema non può distinguere i due casi. Una sessione i cui
+    esercizi siano tutti marcati come saltati è invece una sessione
+    che l'atleta non ha svolto.
   } \\ \hline
 \end{tabularx}
 \end{document}

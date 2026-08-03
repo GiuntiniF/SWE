@@ -1,0 +1,138 @@
+\documentclass[../../../../SoftwareRequirementsSpecification.tex]{subfiles}
+\begin{document}
+% Richiede le macro definite in src/macros/useCaseMacros.tex
+% (incluse nel preambolo di SoftwareRequirementsSpecification.tex)
+
+\ucstart
+\begin{tabularx}{\textwidth}{|l|X|}
+  \hline
+  \ucid{A-02} \\ \hline
+  \ucname{Registrazione Allenamento Svolto} \\ \hline
+  \ucactor{Atleta} \\ \hline
+  \ucdescription{L'atleta registra ciò che ha
+    effettivamente svolto in una sessione di allenamento della
+    scheda che sta seguendo, confermando o correggendo i valori che
+    gli erano stati prescritti.} \\ \hline
+  \ucprecond{L'atleta deve essere autenticato.} \\ \hline
+  \ucpostcond{L'allenamento svolto risulta
+    registrato ed è consultabile dall'atleta (caso d'uso A-04) e dal
+    proprio PT (caso d'uso PT-08).} \\ \hline
+  \ucmainflow{
+    \item L'atleta atterra sulla pagina di registrazione di un
+      allenamento.
+    \item Il sistema propone la data odierna.
+    \item L'atleta conferma la data proposta oppure ne indica
+      un'altra (vedi Nota 1).
+    \item Il sistema individua la scheda assegnata che copre quella
+      data, ne ricava la settimana di allenamento e mostra le
+      sessioni previste in quella settimana, segnalando quelle per
+      cui l'atleta ha già registrato un allenamento.
+    \item L'atleta preme sulla sessione che ha svolto.
+    \item Il sistema mostra l'elenco degli esercizi prescritti per
+      quella sessione in quella settimana, riportando per ciascuno
+      (vedi Note 2 e 3):
+      \begin{itemize}
+        \item il peso sollevato;
+        \item il numero di serie e di ripetizioni eseguite;
+        \item la possibilità di marcare l'esercizio come saltato.
+      \end{itemize}
+    \item L'atleta conferma o corregge i valori di ciascun esercizio
+      e marca come saltati quelli che non ha svolto.
+    \item L'atleta preme il tasto "Salva".
+    \item Il sistema registra l'allenamento svolto (vedi Nota 7).
+  } \\ \hline
+  \ucaltflow{
+    \textbf{3a. Data futura} \newline
+    - L'atleta indica una data successiva a quella odierna. \newline
+    - Il sistema mostra un messaggio ("Non è possibile registrare un
+    allenamento per una data futura"). \newline
+    - Il flusso riprende dal punto 3. \newline
+    \textbf{3b. Nessuna scheda assegnata in quella data} \newline
+    - Nessuna delle schede assegnate all'atleta copre la data
+    indicata. \newline
+    - Il sistema mostra un messaggio ("Nessuna scheda assegnata per
+    la data indicata"). \newline
+    - Il flusso riprende dal punto 3. \newline
+    \textbf{3c. Nessuna scheda assegnata} \newline
+    - All'atleta non è mai stata assegnata alcuna scheda. \newline
+    - Il sistema mostra un messaggio ("Nessuna scheda di allenamento
+    assegnata"). \newline
+    - Il flusso termina. \newline
+    \textbf{5a. Allenamento già registrato} \newline
+    - L'atleta preme su una sessione per cui ha già registrato un
+    allenamento in quella settimana (vedi Nota 6). \newline
+    - Il sistema mostra l'elenco degli esercizi precompilato con i
+    valori che l'atleta aveva registrato, anziché con quelli
+    prescritti; il salvataggio sostituisce l'allenamento
+    registrato. \newline
+    - Il flusso riprende dal punto 7. \newline
+    \textbf{5b. Cancellazione di un allenamento registrato} \newline
+    - Nella situazione del flusso 5a l'atleta preme il tasto
+    "Elimina" anziché correggere i valori. \newline
+    - Il sistema chiede conferma e, ottenutala, cancella
+    l'allenamento registrato. \newline
+    - Il flusso termina. \newline
+    \textbf{8a. Valore obbligatorio non indicato} \newline
+    - Su un esercizio non marcato come saltato manca un valore la cui
+    compilazione è obbligatoria (vedi Nota 3). \newline
+    - Il sistema mostra un messaggio che segnala gli esercizi
+    incompleti e non registra nulla. \newline
+    - Il flusso riprende dal punto 7.
+  } \\ \hline
+  \ucnote{
+    \textbf{Nota 1:} la data indicata non può essere successiva a
+    quella odierna e deve cadere nel periodo di validità di una
+    scheda assegnata all'atleta. Registrare in ritardo è ammesso,
+    anche dopo che la scheda è terminata, purché la data
+    dell'allenamento cada in quel periodo. La settimana di
+    allenamento non è chiesta all'atleta: il sistema la ricava dalla
+    data e dalla data di inizio dell'assegnazione. Poiché i periodi
+    di validità delle schede assegnate a uno stesso atleta non si
+    sovrappongono, una data individua al più una scheda
+    assegnata.\newline
+    \textbf{Nota 2:} gli esercizi mostrati al passo 6 e i valori con
+    cui sono precompilati sono quelli effettivamente prescritti a
+    quell'atleta per quella settimana, cioè quelli che il caso d'uso
+    A-04 gli mostra: derivano dagli allenamenti configurati nel
+    blocco mensile (PT-04), dalla progressione di ciascun esercizio,
+    dai pesi inseriti dal PT al momento dell'assegnazione (PT-05) e
+    dalle personalizzazioni eventualmente introdotte dal PT (PT-09).
+    Un superset è mostrato come i singoli esercizi che lo
+    compongono.\newline
+    \textbf{Nota 3:} i valori registrati sono sempre numeri singoli.
+    Dove la scheda prescrive un intervallo di ripetizioni o
+    l'esecuzione a cedimento non c'è alcun numero da precompilare: il
+    campo è mostrato vuoto e la sua compilazione è obbligatoria,
+    perché è l'unico dato che il sistema non può ricavare da sé. Il
+    peso non è richiesto per gli esercizi a corpo libero. Non è
+    previsto registrare il tempo di recupero effettivamente
+    osservato.\newline
+    \textbf{Nota 4:} l'atleta non può dichiarare di avere sostituito
+    un esercizio con un altro: può soltanto marcarlo come saltato.
+    La sostituzione di un esercizio è una modifica di ciò che è
+    prescritto e spetta al solo PT (flusso 8b del caso d'uso
+    PT-09).\newline
+    \textbf{Nota 5:} l'assenza di un allenamento registrato significa
+    che l'atleta non lo ha registrato, non che non lo ha svolto: il
+    sistema non può distinguere i due casi. Una sessione i cui
+    esercizi siano tutti marcati come saltati è invece una sessione
+    che l'atleta non ha svolto.\newline
+    \textbf{Nota 6:} per ciascuna sessione di ciascuna settimana di
+    una scheda assegnata esiste al più un allenamento registrato: la
+    scheda prescrive ogni sessione una volta sola all'interno della
+    settimana.\newline
+    \textbf{Nota 7:} l'allenamento registrato può essere corretto o
+    cancellato dall'atleta senza limiti di tempo. Il PT non può
+    crearlo, modificarlo né cancellarlo: si limita a consultarlo
+    (caso d'uso PT-08). Il salvataggio non invia alcuna notifica al
+    PT, che consulta gli allenamenti registrati quando lo ritiene
+    opportuno.\newline
+    \textbf{Nota 8:} il PT può personalizzare la settimana corrente
+    (caso d'uso PT-09) anche dopo che l'atleta vi ha registrato un
+    allenamento. L'allenamento registrato non cambia: cambia la
+    prescrizione con cui viene confrontato. Il caso non si presenta
+    per le settimane già trascorse, che PT-09 non rende
+    personalizzabili.
+  } \\ \hline
+\end{tabularx}
+\end{document}
