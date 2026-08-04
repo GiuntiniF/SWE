@@ -29,6 +29,8 @@
     \item Il sistema mostra il form di inserimento dettagli esercizio.
     \item Il PT configura l'esercizio inserendo:
       \begin{itemize}
+        \item Prescrizione di carico: percentuale del massimale
+          (1RM), corpo libero, oppure carico assoluto (vedi le Note).
         \item Numero di serie/ripetizioni.
         \item Tempo di recupero tra una serie e l'altra (in secondi).
         \item Variante di esecuzione se presente (superserie, dropset,
@@ -55,8 +57,9 @@
     (una progressione di carico non ha senso su un esercizio a corpo
     libero, una di volume su un esercizio a cedimento). \newline
     - Il sistema propone quindi solo le progressioni compatibili con
-    l'esercizio scelto al passo 7; se nessuna lo è, il campo non
-    viene proposto. \newline
+    la prescrizione di carico e con le ripetizioni già inserite nello
+    stesso passo 9; se nessuna lo è, il campo non viene
+    proposto. \newline
     - Il flusso riprende dal punto 9.
   } \\ \hline
   \ucvariations{
@@ -70,6 +73,22 @@
       progressione di carico, delle serie/ripetizioni nella
       progressione di volume, di entrambi nella doppia progressione, o
     del tempo di recupero in quella di densità.)
+  } \\ \hline
+  \ucnote{
+    \textbf{Nota 1:} la scheda porta la \textbf{prescrizione} di
+    carico, non il carico: dice come si determina il peso, non quanto
+    vale. Il valore concreto è specifico dell'atleta e viene fissato
+    al momento dell'assegnazione, nel caso d'uso PT-05. Le
+    prescrizioni possibili sono tre: percentuale del massimale
+    (il PT indica la percentuale, il peso si ottiene applicandola al
+    massimale dell'atleta per quell'esercizio), corpo libero
+    (nessun peso da specificare) e carico assoluto (il peso viene
+    chiesto al PT in PT-05).\newline
+    \textbf{Nota 2:} il corpo libero è una prescrizione e non una
+    proprietà dell'esercizio: lo stesso esercizio può essere
+    prescritto a corpo libero oppure zavorrato. Per questo il filtro
+    del flusso 9c non può basarsi sul solo esercizio scelto al
+    passo 7.
   } \\ \hline
 \end{tabularx}
 \end{document}
