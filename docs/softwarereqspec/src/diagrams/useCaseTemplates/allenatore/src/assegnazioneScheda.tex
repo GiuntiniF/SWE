@@ -29,8 +29,10 @@
       data di inizio, il sistema mostra anche la data di fine che ne
       deriva (vedi le Note).
     \item Il PT inserisce i dati e preme il tasto "Continua".
-    \item Il sistema mostra il form per inserire i pesi degli
-      esercizi delle sessioni della prima settimana (vedi le Note).
+    \item Il sistema mostra il form dei carichi degli esercizi delle
+      sessioni della prima settimana. I campi richiesti dipendono
+      dalla prescrizione di carico configurata in PT-04 (vedi le
+      Note).
     \item Il PT inserisce i dati nel form e preme il tasto
       "Assegna Scheda".
     \item Il sistema assegna la Scheda all'Atleta.
@@ -55,20 +57,46 @@
     - Il flusso riprende dal passo 5. \newline
   } \\ \hline
   \ucnote{
-    \textbf{Nota 1:} sarà necessario inserire i pesi degli esercizi solo per le
-    sessioni della prima settimana di allenamento, i pesi delle
-    settimane successive saranno calcolati automaticamente dalle
-    percentuali delle progressioni se queste sono presenti, altrimenti
-    verrà usato lo stesso peso per tutte le settimane.\newline
-    \textbf{Nota 2:} Nel caso di esercizi con variazione drop-set,
-    andranno specificati 2 pesi diversi.\newline
+    \textbf{Nota 1:} i carichi si fissano solo per le sessioni della
+    prima settimana di allenamento; quelli delle settimane successive
+    sono calcolati automaticamente dalle percentuali delle
+    progressioni se queste sono presenti, altrimenti viene usato lo
+    stesso carico per tutte le settimane. Cosa viene chiesto al PT
+    dipende dalla prescrizione di carico dell'esercizio, fissata in
+    PT-04:
+    \begin{itemize}
+      \item \textbf{carico assoluto}: il PT inserisce il peso;
+      \item \textbf{percentuale del massimale}: il sistema mostra il
+        massimale (1RM) dell'atleta per quell'esercizio, con la data
+        in cui è stato rilevato, e il PT lo conferma o lo
+        sovrascrive; il peso della prima settimana è calcolato
+        applicandovi la percentuale. Se per quell'esercizio non è
+        registrato alcun massimale il campo è vuoto ed
+        obbligatorio;
+      \item \textbf{corpo libero}: non viene chiesto nulla e per
+        l'esercizio non esiste alcun carico.
+    \end{itemize}
+    Il massimale inserito qui è un dato di allenamento raccolto dal
+    PT, non un dato anagrafico dell'atleta: resta associato
+    all'atleta e viene sovrascritto ad ogni nuovo rilevamento. Il
+    sistema non registra come il massimale sia stato
+    misurato.\newline
+    \textbf{Nota 2:} nel caso di esercizi con variazione drop-set
+    viene inserito un solo carico: il peso delle ripetizioni in drop
+    è ottenuto applicandovi il moltiplicatore configurato nella
+    variante.\newline
     \textbf{Nota 3:} l'intervallo di date occupato da
     un'assegnazione va dalla data di inizio all'ultimo giorno
     dell'ultimo blocco mensile: ciascun blocco dura 4 settimane
     (28 giorni), quindi la data di fine è determinata dalla data di
     inizio e dal numero di blocchi, e non viene chiesta al PT. Due
     assegnazioni contigue, in cui una termina il giorno prima che
-    l'altra inizi, non si sovrappongono e sono quindi ammesse.
+    l'altra inizi, non si sovrappongono e sono quindi ammesse.\newline
+    \textbf{Nota 4:} i carichi fissati qui non cambiano se il
+    massimale dell'atleta viene aggiornato in seguito: restano quelli
+    calcolati al momento dell'assegnazione. Per adeguare una scheda
+    già in corso il PT usa il caso d'uso PT-09 o assegna una nuova
+    scheda.
   } \\ \hline
 \end{tabularx}
 \end{document}
